@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import type { GitLabConnection } from '~/types/GitLab';
 import { useGitLabAPI } from './useGitLabAPI';
 import { gitlabConnectionStore, gitlabConnection, isGitLabConnected } from '~/lib/stores/gitlabConnection';
+import { STORAGE_KEY_GITLAB_CONNECTION } from '~/lib/persistence/storageKeys';
 
 export interface ConnectionState {
   isConnected: boolean;
@@ -21,8 +22,6 @@ export interface UseGitLabConnectionReturn extends ConnectionState {
   testConnection: () => Promise<boolean>;
   refreshStats: () => Promise<void>;
 }
-
-const STORAGE_KEY = 'gitlab_connection';
 
 export function useGitLabConnection(): UseGitLabConnectionReturn {
   const connection = useStore(gitlabConnection);
@@ -55,7 +54,7 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
       }
 
       // Load saved connection from localStorage
-      const savedConnection = localStorage.getItem(STORAGE_KEY);
+      const savedConnection = localStorage.getItem(STORAGE_KEY_GITLAB_CONNECTION);
 
       if (savedConnection) {
         const parsed = JSON.parse(savedConnection);
@@ -77,7 +76,7 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
       setIsLoading(false);
 
       // Clean up corrupted data
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY_GITLAB_CONNECTION);
     }
   }, [connection]);
 
@@ -170,7 +169,7 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
 
   const disconnect = useCallback(() => {
     // Clear localStorage
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY_GITLAB_CONNECTION);
 
     // Clear all GitLab-related cookies
     Cookies.remove('gitlabToken');

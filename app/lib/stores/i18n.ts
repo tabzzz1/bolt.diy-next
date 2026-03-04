@@ -1,17 +1,15 @@
 import { atom } from 'nanostores';
 import i18n from '~/lib/i18n/config';
+import { STORAGE_KEY_USER_PROFILE } from '~/lib/persistence/storageKeys';
 
 export type Language = 'en' | 'zh';
-
-/** 与 SettingsTab.tsx 共用同一个 localStorage key */
-const PROFILE_KEY = 'bolt_user_profile';
 
 export const DEFAULT_LANGUAGE: Language = 'en';
 
 function initLanguageStore(): Language {
   if (!import.meta.env.SSR) {
     try {
-      const raw = localStorage.getItem(PROFILE_KEY);
+      const raw = localStorage.getItem(STORAGE_KEY_USER_PROFILE);
       const profile = raw ? JSON.parse(raw) : {};
 
       return profile.language === 'zh' ? 'zh' : DEFAULT_LANGUAGE;
@@ -38,10 +36,10 @@ export function setLanguage(lang: Language): void {
   i18n.changeLanguage(lang);
 
   try {
-    const raw = localStorage.getItem(PROFILE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY_USER_PROFILE);
     const profile = raw ? JSON.parse(raw) : {};
     profile.language = lang;
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    localStorage.setItem(STORAGE_KEY_USER_PROFILE, JSON.stringify(profile));
   } catch (error) {
     console.error('Error saving language preference:', error);
   }

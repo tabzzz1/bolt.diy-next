@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { netlifyConnection, updateNetlifyConnection, initializeNetlifyConnection } from '~/lib/stores/netlify';
+import { STORAGE_KEY_NETLIFY_CONNECTION } from '~/lib/persistence/storageKeys';
 import type { NetlifySite, NetlifyDeploy, NetlifyBuild, NetlifyUser } from '~/types/netlify';
 import {
   CloudIcon,
@@ -444,7 +445,7 @@ export default function NetlifyConnection() {
 
   const handleDisconnect = () => {
     // Clear from localStorage
-    localStorage.removeItem('netlify_connection');
+    localStorage.removeItem(STORAGE_KEY_NETLIFY_CONNECTION);
 
     // Remove cookies
     document.cookie = 'netlifyToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';

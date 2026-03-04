@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Button } from '~/components/ui/Button';
 import { classNames } from '~/utils/classNames';
 import { Database, Trash2, RefreshCw, Clock, HardDrive, CheckCircle } from 'lucide-react';
+import { STORAGE_KEY_GITHUB_CONNECTION, STORAGE_KEY_GITHUB_STATS_CACHE } from '~/lib/persistence/storageKeys';
 
 interface CacheEntry {
   key: string;
@@ -28,8 +29,8 @@ interface GitHubCacheManagerProps {
 class CacheManagerService {
   private static readonly _cachePrefix = 'github_';
   private static readonly _cacheKeys = [
-    'github_connection',
-    'github_stats_cache',
+    STORAGE_KEY_GITHUB_CONNECTION,
+    STORAGE_KEY_GITHUB_STATS_CACHE,
     'github_repositories_cache',
     'github_user_cache',
     'github_rate_limits',

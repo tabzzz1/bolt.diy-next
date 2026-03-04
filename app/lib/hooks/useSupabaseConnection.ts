@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useStore } from '@nanostores/react';
 import { logStore } from '~/lib/stores/logs';
+import { STORAGE_KEY_SUPABASE_CONNECTION, STORAGE_KEY_SUPABASE_CREDENTIALS } from '~/lib/persistence/storageKeys';
 import {
   supabaseConnection,
   isConnecting,
@@ -33,8 +34,8 @@ export function useSupabaseConnection() {
       }
 
       // Then check localStorage for additional data
-      const savedConnection = localStorage.getItem('supabase_connection');
-      const savedCredentials = localStorage.getItem('supabaseCredentials');
+      const savedConnection = localStorage.getItem(STORAGE_KEY_SUPABASE_CONNECTION);
+      const savedCredentials = localStorage.getItem(STORAGE_KEY_SUPABASE_CREDENTIALS);
 
       if (savedConnection) {
         console.log('useSupabaseConnection: Loading from localStorage');

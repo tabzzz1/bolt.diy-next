@@ -1,4 +1,5 @@
 import { atom, map } from 'nanostores';
+import { STORAGE_KEY_READ_LOGS } from '~/lib/persistence/storageKeys';
 import Cookies from 'js-cookie';
 import { createScopedLogger } from '~/utils/logger';
 
@@ -84,7 +85,7 @@ class LogStore {
       return;
     }
 
-    const savedReadLogs = localStorage.getItem('bolt_read_logs');
+    const savedReadLogs = localStorage.getItem(STORAGE_KEY_READ_LOGS);
 
     if (savedReadLogs) {
       try {
@@ -106,7 +107,7 @@ class LogStore {
       return;
     }
 
-    localStorage.setItem('bolt_read_logs', JSON.stringify(Array.from(this._readLogs)));
+    localStorage.setItem(STORAGE_KEY_READ_LOGS, JSON.stringify(Array.from(this._readLogs)));
   }
 
   private _generateId(): string {

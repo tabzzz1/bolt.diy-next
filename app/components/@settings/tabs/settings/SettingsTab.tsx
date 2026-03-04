@@ -7,6 +7,7 @@ import { Switch } from '~/components/ui/Switch';
 import type { UserProfile } from '~/components/@settings/core/types';
 import { isMac } from '~/utils/os';
 import { setLanguage, type Language } from '~/lib/stores/i18n';
+import { STORAGE_KEY_USER_PROFILE } from '~/lib/persistence/storageKeys';
 
 // Helper to get modifier key symbols/text
 const getModifierSymbol = (modifier: string): string => {
@@ -26,7 +27,7 @@ export default function SettingsTab() {
   const { t } = useTranslation('settings');
   const [currentTimezone, setCurrentTimezone] = useState('');
   const [settings, setSettings] = useState<UserProfile>(() => {
-    const saved = localStorage.getItem('bolt_user_profile');
+    const saved = localStorage.getItem(STORAGE_KEY_USER_PROFILE);
     return saved
       ? JSON.parse(saved)
       : {
@@ -51,14 +52,14 @@ export default function SettingsTab() {
     }
 
     try {
-      const existingProfile = JSON.parse(localStorage.getItem('bolt_user_profile') || '{}');
+      const existingProfile = JSON.parse(localStorage.getItem(STORAGE_KEY_USER_PROFILE) || '{}');
       const updatedProfile = {
         ...existingProfile,
         notifications: settings.notifications,
         language: settings.language,
         timezone: settings.timezone,
       };
-      localStorage.setItem('bolt_user_profile', JSON.stringify(updatedProfile));
+      localStorage.setItem(STORAGE_KEY_USER_PROFILE, JSON.stringify(updatedProfile));
       toast.success(t('saveSuccess'));
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -122,17 +123,17 @@ export default function SettingsTab() {
                 setSettings((prev) => ({ ...prev, notifications: checked }));
 
                 // Update localStorage immediately
-                const existingProfile = JSON.parse(localStorage.getItem('bolt_user_profile') || '{}');
+                const existingProfile = JSON.parse(localStorage.getItem(STORAGE_KEY_USER_PROFILE) || '{}');
                 const updatedProfile = {
                   ...existingProfile,
                   notifications: checked,
                 };
-                localStorage.setItem('bolt_user_profile', JSON.stringify(updatedProfile));
+                localStorage.setItem(STORAGE_KEY_USER_PROFILE, JSON.stringify(updatedProfile));
 
                 // Dispatch storage event for other components
                 window.dispatchEvent(
                   new StorageEvent('storage', {
-                    key: 'bolt_user_profile',
+                    key: STORAGE_KEY_USER_PROFILE,
                     newValue: JSON.stringify(updatedProfile),
                   }),
                 );

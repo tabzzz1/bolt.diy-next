@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Octokit } from '@octokit/rest';
 import { classNames } from '~/utils/classNames';
 import { getLocalStorage } from '~/lib/persistence/localStorage';
+import { STORAGE_KEY_GITHUB_CONNECTION } from '~/lib/persistence/storageKeys';
 import type { GitHubUserResponse, GitHubRepoInfo } from '~/types/GitHub';
 import { logStore } from '~/lib/stores/logs';
 import { chatId } from '~/lib/persistence/useChatHistory';
@@ -57,7 +58,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
 
   useEffect(() => {
     if (isOpen) {
-      const connection = getLocalStorage('github_connection');
+      const connection = getLocalStorage(STORAGE_KEY_GITHUB_CONNECTION);
 
       // Set a default repository name based on the project name with proper sanitization
       setRepoName(sanitizeRepoName(projectName));
@@ -134,10 +135,10 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
             toast.error('GitHub token expired. Please reconnect your account.');
 
             // Clear invalid token
-            const connection = getLocalStorage('github_connection');
+            const connection = getLocalStorage(STORAGE_KEY_GITHUB_CONNECTION);
 
             if (connection) {
-              localStorage.removeItem('github_connection');
+              localStorage.removeItem(STORAGE_KEY_GITHUB_CONNECTION);
               setUser(null);
             }
           } else if (response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0') {
@@ -188,7 +189,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const connection = getLocalStorage('github_connection');
+    const connection = getLocalStorage(STORAGE_KEY_GITHUB_CONNECTION);
 
     if (!connection?.token || !connection?.user) {
       toast.error('Please connect your GitHub account in Settings > Connections first');
@@ -545,7 +546,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
     setShowAuthDialog(false);
 
     // Refresh user data after auth
-    const connection = getLocalStorage('github_connection');
+    const connection = getLocalStorage(STORAGE_KEY_GITHUB_CONNECTION);
 
     if (connection?.user && connection?.token) {
       setUser(connection.user);

@@ -1,10 +1,11 @@
 import { atom } from 'nanostores';
+import { STORAGE_KEY_NETLIFY_CONNECTION } from '~/lib/persistence/storageKeys';
 import type { NetlifyConnection, NetlifyUser } from '~/types/netlify';
 import { logStore } from './logs';
 import { toast } from 'react-toastify';
 
 // Initialize with stored connection or environment variable
-const storedConnection = typeof window !== 'undefined' ? localStorage.getItem('netlify_connection') : null;
+const storedConnection = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_NETLIFY_CONNECTION) : null;
 const envToken = import.meta.env.VITE_NETLIFY_ACCESS_TOKEN;
 console.log('Netlify store: envToken loaded:', envToken ? '[TOKEN_EXISTS]' : '[NO_TOKEN]');
 
@@ -55,7 +56,7 @@ export async function initializeNetlifyConnection() {
     };
 
     // Store in localStorage for persistence
-    localStorage.setItem('netlify_connection', JSON.stringify(connectionData));
+    localStorage.setItem(STORAGE_KEY_NETLIFY_CONNECTION, JSON.stringify(connectionData));
 
     // Update the store
     updateNetlifyConnection(connectionData);
@@ -77,7 +78,7 @@ export const updateNetlifyConnection = (updates: Partial<NetlifyConnection>) => 
 
   // Persist to localStorage
   if (typeof window !== 'undefined') {
-    localStorage.setItem('netlify_connection', JSON.stringify(newState));
+    localStorage.setItem(STORAGE_KEY_NETLIFY_CONNECTION, JSON.stringify(newState));
   }
 };
 

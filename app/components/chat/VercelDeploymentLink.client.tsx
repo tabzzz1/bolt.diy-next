@@ -1,6 +1,7 @@
 import { useStore } from '@nanostores/react';
 import { vercelConnection } from '~/lib/stores/vercel';
 import { chatId } from '~/lib/persistence/useChatHistory';
+import { storageKeyVercelProject } from '~/lib/persistence/storageKeys';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { useEffect, useState } from 'react';
 
@@ -17,7 +18,7 @@ export function VercelDeploymentLink() {
       }
 
       // Check if we have a stored project ID for this chat
-      const projectId = localStorage.getItem(`vercel-project-${currentChatId}`);
+      const projectId = localStorage.getItem(storageKeyVercelProject(currentChatId));
 
       if (!projectId) {
         return;

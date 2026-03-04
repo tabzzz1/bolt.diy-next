@@ -1,4 +1,5 @@
 import { atom, computed } from 'nanostores';
+import { STORAGE_KEY_GITHUB_CONNECTION } from '~/lib/persistence/storageKeys';
 import Cookies from 'js-cookie';
 import { logStore } from '~/lib/stores/logs';
 import { gitHubApiService } from '~/lib/services/githubApiService';
@@ -21,7 +22,7 @@ const githubConnectionAtom = atom<GitHubConnection>({
 // Initialize connection from localStorage on startup
 function initializeConnection() {
   try {
-    const savedConnection = localStorage.getItem('github_connection');
+    const savedConnection = localStorage.getItem(STORAGE_KEY_GITHUB_CONNECTION);
 
     if (savedConnection) {
       const parsed = JSON.parse(savedConnection);
@@ -38,7 +39,7 @@ function initializeConnection() {
     }
   } catch (error) {
     console.error('Error initializing GitHub connection:', error);
-    localStorage.removeItem('github_connection');
+    localStorage.removeItem(STORAGE_KEY_GITHUB_CONNECTION);
   }
 }
 
@@ -94,7 +95,7 @@ export const githubConnectionStore = {
       Cookies.set('git:github.com', JSON.stringify({ username: token, password: 'x-oauth-basic' }));
 
       // Store connection details in localStorage
-      localStorage.setItem('github_connection', JSON.stringify(connection));
+      localStorage.setItem(STORAGE_KEY_GITHUB_CONNECTION, JSON.stringify(connection));
 
       // Update atom
       githubConnectionAtom.set(connection);
@@ -130,7 +131,7 @@ export const githubConnectionStore = {
     });
 
     // Clear localStorage
-    localStorage.removeItem('github_connection');
+    localStorage.removeItem(STORAGE_KEY_GITHUB_CONNECTION);
 
     // Clear cookies
     Cookies.remove('githubUsername');
@@ -170,7 +171,7 @@ export const githubConnectionStore = {
       };
 
       // Update localStorage
-      localStorage.setItem('github_connection', JSON.stringify(updatedConnection));
+      localStorage.setItem(STORAGE_KEY_GITHUB_CONNECTION, JSON.stringify(updatedConnection));
 
       // Update atom
       githubConnectionAtom.set(updatedConnection);
@@ -206,7 +207,7 @@ export const githubConnectionStore = {
     };
 
     githubConnectionAtom.set(updatedConnection);
-    localStorage.setItem('github_connection', JSON.stringify(updatedConnection));
+    localStorage.setItem(STORAGE_KEY_GITHUB_CONNECTION, JSON.stringify(updatedConnection));
   },
 
   // Clear stats cache

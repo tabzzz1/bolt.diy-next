@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import type { GitHubUserResponse, GitHubConnection } from '~/types/GitHub';
 import { useGitHubAPI } from './useGitHubAPI';
 import { githubConnection, isConnecting, updateGitHubConnection } from '~/lib/stores/github';
+import { STORAGE_KEY_GITHUB_CONNECTION } from '~/lib/persistence/storageKeys';
 
 export interface ConnectionState {
   isConnected: boolean;
@@ -21,8 +22,6 @@ export interface UseGitHubConnectionReturn extends ConnectionState {
   refreshConnection: () => Promise<void>;
   testConnection: () => Promise<boolean>;
 }
-
-const STORAGE_KEY = 'github_connection';
 
 export function useGitHubConnection(): UseGitHubConnectionReturn {
   const connection = useStore(githubConnection);
@@ -61,7 +60,7 @@ export function useGitHubConnection(): UseGitHubConnectionReturn {
       setIsLoading(false);
 
       // Clean up corrupted data
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY_GITHUB_CONNECTION);
     }
   }, [connection]);
 
@@ -168,7 +167,7 @@ export function useGitHubConnection(): UseGitHubConnectionReturn {
 
   const disconnect = useCallback(() => {
     // Clear localStorage
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY_GITHUB_CONNECTION);
 
     // Clear all GitHub-related cookies
     Cookies.remove('githubToken');

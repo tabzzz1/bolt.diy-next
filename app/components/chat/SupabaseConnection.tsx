@@ -3,6 +3,7 @@ import { useSupabaseConnection } from '~/lib/hooks/useSupabaseConnection';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { chatId } from '~/lib/persistence/useChatHistory';
+import { storageKeySupabaseProject } from '~/lib/persistence/storageKeys';
 import { fetchSupabaseStats } from '~/lib/stores/supabase';
 import { Dialog, DialogRoot, DialogClose, DialogTitle, DialogButton } from '~/components/ui/Dialog';
 
@@ -40,7 +41,7 @@ export function SupabaseConnection() {
 
   useEffect(() => {
     if (isConnected && currentChatId) {
-      const savedProjectId = localStorage.getItem(`supabase-project-${currentChatId}`);
+      const savedProjectId = localStorage.getItem(storageKeySupabaseProject(currentChatId));
 
       /*
        * If there's no saved project for this chat but there is a global selected project,
@@ -48,7 +49,7 @@ export function SupabaseConnection() {
        */
       if (!savedProjectId && supabaseConn.selectedProjectId) {
         // Save the current global project to this chat
-        localStorage.setItem(`supabase-project-${currentChatId}`, supabaseConn.selectedProjectId);
+        localStorage.setItem(storageKeySupabaseProject(currentChatId), supabaseConn.selectedProjectId);
       } else if (savedProjectId && savedProjectId !== supabaseConn.selectedProjectId) {
         selectProject(savedProjectId);
       }
@@ -57,9 +58,9 @@ export function SupabaseConnection() {
 
   useEffect(() => {
     if (currentChatId && supabaseConn.selectedProjectId) {
-      localStorage.setItem(`supabase-project-${currentChatId}`, supabaseConn.selectedProjectId);
+      localStorage.setItem(storageKeySupabaseProject(currentChatId), supabaseConn.selectedProjectId);
     } else if (currentChatId && !supabaseConn.selectedProjectId) {
-      localStorage.removeItem(`supabase-project-${currentChatId}`);
+      localStorage.removeItem(storageKeySupabaseProject(currentChatId));
     }
   }, [currentChatId, supabaseConn.selectedProjectId]);
 

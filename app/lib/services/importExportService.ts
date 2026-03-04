@@ -1,4 +1,16 @@
 import Cookies from 'js-cookie';
+import {
+  STORAGE_KEY_USER_PROFILE,
+  STORAGE_KEY_PROFILE,
+  STORAGE_KEY_PROVIDER_SETTINGS,
+  STORAGE_KEY_VIEWED_FEATURES,
+  STORAGE_KEY_TAB_CONFIGURATION,
+  STORAGE_KEY_NETLIFY_CONNECTION,
+  STORAGE_KEY_ACKNOWLEDGED_CONNECTION_ISSUE,
+  STORAGE_KEY_ERROR_LOGS,
+  STORAGE_KEY_READ_LOGS,
+  STORAGE_KEY_LAST_ACKNOWLEDGED_UPDATE,
+} from '~/lib/persistence/storageKeys';
 import { type Message } from 'ai';
 import { getAllChats, deleteChat } from '~/lib/persistence/chats';
 
@@ -69,16 +81,16 @@ export class ImportExportService {
         // Core settings
         core: {
           // User profile and main settings
-          bolt_user_profile: this._safeGetItem('bolt_user_profile'),
+          bolt_user_profile: this._safeGetItem(STORAGE_KEY_USER_PROFILE),
           bolt_settings: this._safeGetItem('bolt_settings'),
-          bolt_profile: this._safeGetItem('bolt_profile'),
+          bolt_profile: this._safeGetItem(STORAGE_KEY_PROFILE),
           theme: this._safeGetItem('theme'),
         },
 
         // Provider settings (both local and cloud)
         providers: {
           // Provider configurations from localStorage
-          provider_settings: this._safeGetItem('provider_settings'),
+          provider_settings: this._safeGetItem(STORAGE_KEY_PROVIDER_SETTINGS),
 
           // API keys from cookies
           apiKeys: allCookies.apiKeys,
@@ -94,7 +106,7 @@ export class ImportExportService {
         // Feature settings
         features: {
           // Feature flags
-          viewed_features: this._safeGetItem('bolt_viewed_features'),
+          viewed_features: this._safeGetItem(STORAGE_KEY_VIEWED_FEATURES),
           developer_mode: this._safeGetItem('bolt_developer_mode'),
 
           // Context optimization
@@ -117,7 +129,7 @@ export class ImportExportService {
         // UI configuration
         ui: {
           // Tab configuration
-          bolt_tab_configuration: this._safeGetItem('bolt_tab_configuration'),
+          bolt_tab_configuration: this._safeGetItem(STORAGE_KEY_TAB_CONFIGURATION),
           tabConfiguration: allCookies.tabConfiguration,
 
           // Prompt settings
@@ -128,7 +140,7 @@ export class ImportExportService {
         // Connections
         connections: {
           // Netlify connection
-          netlify_connection: this._safeGetItem('netlify_connection'),
+          netlify_connection: this._safeGetItem(STORAGE_KEY_NETLIFY_CONNECTION),
 
           // GitHub connections
           ...this._getGitHubConnections(allCookies),
@@ -139,11 +151,11 @@ export class ImportExportService {
           // Debug settings
           isDebugEnabled: allCookies.isDebugEnabled,
           acknowledged_debug_issues: this._safeGetItem('bolt_acknowledged_debug_issues'),
-          acknowledged_connection_issue: this._safeGetItem('bolt_acknowledged_connection_issue'),
+          acknowledged_connection_issue: this._safeGetItem(STORAGE_KEY_ACKNOWLEDGED_CONNECTION_ISSUE),
 
           // Error logs
-          error_logs: this._safeGetItem('error_logs'),
-          bolt_read_logs: this._safeGetItem('bolt_read_logs'),
+          error_logs: this._safeGetItem(STORAGE_KEY_ERROR_LOGS),
+          bolt_read_logs: this._safeGetItem(STORAGE_KEY_READ_LOGS),
 
           // Event logs
           eventLogs: allCookies.eventLogs,
@@ -152,7 +164,7 @@ export class ImportExportService {
         // Update settings
         updates: {
           update_settings: this._safeGetItem('update_settings'),
-          last_acknowledged_update: this._safeGetItem('bolt_last_acknowledged_version'),
+          last_acknowledged_update: this._safeGetItem(STORAGE_KEY_LAST_ACKNOWLEDGED_UPDATE),
         },
 
         // Chat snapshots (for chat history)
@@ -384,7 +396,7 @@ export class ImportExportService {
       // Import provider_settings to localStorage
       if (data.providers.provider_settings) {
         try {
-          this._safeSetItem('provider_settings', data.providers.provider_settings);
+          this._safeSetItem(STORAGE_KEY_PROVIDER_SETTINGS, data.providers.provider_settings);
         } catch (err) {
           console.error('Error importing provider settings:', err);
         }
@@ -421,7 +433,7 @@ export class ImportExportService {
       // Import localStorage UI settings
       if (data.ui.bolt_tab_configuration) {
         try {
-          this._safeSetItem('bolt_tab_configuration', data.ui.bolt_tab_configuration);
+          this._safeSetItem(STORAGE_KEY_TAB_CONFIGURATION, data.ui.bolt_tab_configuration);
         } catch (err) {
           console.error('Error importing tab configuration:', err);
         }
@@ -453,7 +465,7 @@ export class ImportExportService {
       // Import Netlify connection
       if (data.connections.netlify_connection) {
         try {
-          this._safeSetItem('netlify_connection', data.connections.netlify_connection);
+          this._safeSetItem(STORAGE_KEY_NETLIFY_CONNECTION, data.connections.netlify_connection);
         } catch (err) {
           console.error('Error importing Netlify connection:', err);
         }
@@ -476,9 +488,9 @@ export class ImportExportService {
       // Import debug localStorage settings
       const debugLocalStorageKeys = [
         'bolt_acknowledged_debug_issues',
-        'bolt_acknowledged_connection_issue',
-        'error_logs',
-        'bolt_read_logs',
+        STORAGE_KEY_ACKNOWLEDGED_CONNECTION_ISSUE,
+        STORAGE_KEY_ERROR_LOGS,
+        STORAGE_KEY_READ_LOGS,
       ];
 
       debugLocalStorageKeys.forEach((key) => {
@@ -516,7 +528,7 @@ export class ImportExportService {
 
       if (data.updates.last_acknowledged_update) {
         try {
-          this._safeSetItem('bolt_last_acknowledged_version', data.updates.last_acknowledged_update);
+          this._safeSetItem(STORAGE_KEY_LAST_ACKNOWLEDGED_UPDATE, data.updates.last_acknowledged_update);
         } catch (err) {
           console.error('Error importing last acknowledged update:', err);
         }

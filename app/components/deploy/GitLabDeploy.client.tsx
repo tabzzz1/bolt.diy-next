@@ -7,6 +7,7 @@ import { useState } from 'react';
 import type { ActionCallbackData } from '~/lib/runtime/message-parser';
 import { chatId } from '~/lib/persistence/useChatHistory';
 import { getLocalStorage } from '~/lib/persistence/localStorage';
+import { STORAGE_KEY_GITLAB_CONNECTION } from '~/lib/persistence/storageKeys';
 import { formatBuildFailureOutput } from './deployUtils';
 
 export function useGitLabDeploy() {
@@ -14,7 +15,7 @@ export function useGitLabDeploy() {
   const currentChatId = useStore(chatId);
 
   const handleGitLabDeploy = async () => {
-    const connection = getLocalStorage('gitlab_connection');
+    const connection = getLocalStorage(STORAGE_KEY_GITLAB_CONNECTION);
 
     if (!connection?.token || !connection?.user) {
       toast.error('Please connect your GitLab account in Settings > Connections first');
@@ -169,6 +170,6 @@ export function useGitLabDeploy() {
   return {
     isDeploying,
     handleGitLabDeploy,
-    isConnected: !!getLocalStorage('gitlab_connection')?.user,
+    isConnected: !!getLocalStorage(STORAGE_KEY_GITLAB_CONNECTION)?.user,
   };
 }

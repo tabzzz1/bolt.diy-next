@@ -1,3 +1,5 @@
+import { STORAGE_KEY_LAST_ACKNOWLEDGED_UPDATE } from '~/lib/persistence/storageKeys';
+
 export interface UpdateCheckResult {
   available: boolean;
   version: string;
@@ -101,7 +103,7 @@ export const checkForUpdates = async (): Promise<UpdateCheckResult> => {
 export const acknowledgeUpdate = async (version: string): Promise<void> => {
   // Store the acknowledged version in localStorage
   try {
-    localStorage.setItem('last_acknowledged_update', version);
+    localStorage.setItem(STORAGE_KEY_LAST_ACKNOWLEDGED_UPDATE, version);
   } catch (error) {
     console.error('Failed to store acknowledged version:', error);
   }

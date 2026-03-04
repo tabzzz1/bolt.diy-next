@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { MCPConfig, MCPServerTools } from '~/lib/services/mcpService';
+import { STORAGE_KEY_MCP_SETTINGS } from '~/lib/persistence/storageKeys';
 
-const MCP_SETTINGS_KEY = 'mcp_settings';
 const isBrowser = typeof window !== 'undefined';
 
 type MCPSettings = {
@@ -42,7 +42,7 @@ export const useMCPStore = create<Store & Actions>((set, get) => ({
     }
 
     if (isBrowser) {
-      const savedConfig = localStorage.getItem(MCP_SETTINGS_KEY);
+      const savedConfig = localStorage.getItem(STORAGE_KEY_MCP_SETTINGS);
 
       if (savedConfig) {
         try {
@@ -56,7 +56,7 @@ export const useMCPStore = create<Store & Actions>((set, get) => ({
           }));
         }
       } else {
-        localStorage.setItem(MCP_SETTINGS_KEY, JSON.stringify(defaultSettings));
+        localStorage.setItem(STORAGE_KEY_MCP_SETTINGS, JSON.stringify(defaultSettings));
       }
     }
 
@@ -73,7 +73,7 @@ export const useMCPStore = create<Store & Actions>((set, get) => ({
       const serverTools = await updateServerConfig(newSettings.mcpConfig);
 
       if (isBrowser) {
-        localStorage.setItem(MCP_SETTINGS_KEY, JSON.stringify(newSettings));
+        localStorage.setItem(STORAGE_KEY_MCP_SETTINGS, JSON.stringify(newSettings));
       }
 
       set(() => ({ settings: newSettings, serverTools }));

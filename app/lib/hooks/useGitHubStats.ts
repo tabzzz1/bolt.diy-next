@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import type { GitHubStats, GitHubConnection } from '~/types/GitHub';
 import { gitHubApiService } from '~/lib/services/githubApiService';
+import { STORAGE_KEY_GITHUB_STATS_CACHE, STORAGE_KEY_GITHUB_CONNECTION } from '~/lib/persistence/storageKeys';
 
 export interface UseGitHubStatsState {
   stats: GitHubStats | null;
@@ -24,7 +25,6 @@ export interface UseGitHubStatsReturn extends UseGitHubStatsState {
   isStale: boolean;
 }
 
-const STATS_CACHE_KEY = 'github_stats_cache';
 const DEFAULT_CACHE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 export function useGitHubStats(
@@ -112,7 +112,7 @@ export function useGitHubStats(
 
   const loadCachedStats = useCallback(() => {
     try {
-      const cached = localStorage.getItem(STATS_CACHE_KEY);
+      const cached = localStorage.getItem(STORAGE_KEY_GITHUB_STATS_CACHE);
 
       if (cached) {
         const { stats, timestamp, userLogin } = JSON.parse(cached);
@@ -130,7 +130,7 @@ export function useGitHubStats(
       console.error('Error loading cached stats:', error);
 
       // Clear corrupted cache
-      localStorage.removeItem(STATS_CACHE_KEY);
+      localStorage.removeItem(STORAGE_KEY_GITHUB_STATS_CACHE);
     }
   }, [connection?.user?.login]);
 
@@ -141,7 +141,7 @@ export function useGitHubStats(
         timestamp: Date.now(),
         userLogin,
       };
-      localStorage.setItem(STATS_CACHE_KEY, JSON.stringify(cacheData));
+      localStorage.setItem(STORAGE_KEY_GITHUB_STATS_CACHE, JSON.stringify(cacheData));
     } catch (error) {
       console.error('Error saving stats to cache:', error);
     }
@@ -211,7 +211,7 @@ export function useGitHubStats(
           ...connection,
           stats,
         };
-        localStorage.setItem('github_connection', JSON.stringify(updatedConnection));
+        localStorage.setItem(STORAGE_KEY_GITHUB_CONNECTION, JSON.stringify(updatedConnection));
       }
 
       // Only show success toast for manual refreshes, not auto-fetches
@@ -257,7 +257,7 @@ export function useGitHubStats(
     });
 
     // Clear cache
-    localStorage.removeItem(STATS_CACHE_KEY);
+    localStorage.removeItem(STORAGE_KEY_GITHUB_STATS_CACHE);
   }, []);
 
   return {

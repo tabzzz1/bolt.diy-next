@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { checkConnection } from '~/lib/api/connection';
-
-const ACKNOWLEDGED_CONNECTION_ISSUE_KEY = 'bolt_acknowledged_connection_issue';
+import { STORAGE_KEY_ACKNOWLEDGED_CONNECTION_ISSUE } from '~/lib/persistence/storageKeys';
 
 type ConnectionIssueType = 'disconnected' | 'high-latency' | null;
 
 const getAcknowledgedIssue = (): string | null => {
   try {
-    return localStorage.getItem(ACKNOWLEDGED_CONNECTION_ISSUE_KEY);
+    return localStorage.getItem(STORAGE_KEY_ACKNOWLEDGED_CONNECTION_ISSUE);
   } catch {
     return null;
   }

@@ -1,4 +1,5 @@
 import { atom, computed } from 'nanostores';
+import { STORAGE_KEY_GITLAB_CONNECTION } from '~/lib/persistence/storageKeys';
 import Cookies from 'js-cookie';
 import { logStore } from '~/lib/stores/logs';
 import { GitLabApiService } from '~/lib/services/gitlabApiService';
@@ -19,7 +20,7 @@ const gitlabUrlAtom = atom('https://gitlab.com');
 // Initialize connection from localStorage on startup
 function initializeConnection() {
   try {
-    const savedConnection = localStorage.getItem('gitlab_connection');
+    const savedConnection = localStorage.getItem(STORAGE_KEY_GITLAB_CONNECTION);
 
     if (savedConnection) {
       const parsed = JSON.parse(savedConnection);
@@ -36,7 +37,7 @@ function initializeConnection() {
     }
   } catch (error) {
     console.error('Error initializing GitLab connection:', error);
-    localStorage.removeItem('gitlab_connection');
+    localStorage.removeItem(STORAGE_KEY_GITLAB_CONNECTION);
   }
 }
 
@@ -84,7 +85,7 @@ class GitLabConnectionStore {
 
       // Store connection details in localStorage
       localStorage.setItem(
-        'gitlab_connection',
+        STORAGE_KEY_GITLAB_CONNECTION,
         JSON.stringify({
           user,
           token,
@@ -150,7 +151,7 @@ class GitLabConnectionStore {
 
       // Update localStorage
       const updatedConnection = { ...connection, stats };
-      localStorage.setItem('gitlab_connection', JSON.stringify(updatedConnection));
+      localStorage.setItem(STORAGE_KEY_GITLAB_CONNECTION, JSON.stringify(updatedConnection));
 
       return { success: true, stats };
     } catch (error) {
@@ -170,7 +171,7 @@ class GitLabConnectionStore {
     Cookies.remove('gitlabUrl');
 
     // Clear localStorage
-    localStorage.removeItem('gitlab_connection');
+    localStorage.removeItem(STORAGE_KEY_GITLAB_CONNECTION);
 
     // Reset state
     gitlabConnectionAtom.set({
@@ -187,7 +188,7 @@ class GitLabConnectionStore {
 
   loadSavedConnection() {
     try {
-      const savedConnection = localStorage.getItem('gitlab_connection');
+      const savedConnection = localStorage.getItem(STORAGE_KEY_GITLAB_CONNECTION);
 
       if (savedConnection) {
         const parsed = JSON.parse(savedConnection);
@@ -205,7 +206,7 @@ class GitLabConnectionStore {
       }
     } catch (error) {
       console.error('Error parsing saved GitLab connection:', error);
-      localStorage.removeItem('gitlab_connection');
+      localStorage.removeItem(STORAGE_KEY_GITLAB_CONNECTION);
     }
 
     return null;
@@ -249,7 +250,7 @@ class GitLabConnectionStore {
 
       // Store connection details in localStorage
       localStorage.setItem(
-        'gitlab_connection',
+        STORAGE_KEY_GITLAB_CONNECTION,
         JSON.stringify({
           user,
           token: envToken,

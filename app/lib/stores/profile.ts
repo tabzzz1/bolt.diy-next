@@ -1,4 +1,5 @@
 import { atom } from 'nanostores';
+import { STORAGE_KEY_PROFILE } from '~/lib/persistence/storageKeys';
 
 interface Profile {
   username: string;
@@ -7,7 +8,7 @@ interface Profile {
 }
 
 // Initialize with stored profile or defaults
-const storedProfile = typeof window !== 'undefined' ? localStorage.getItem('bolt_profile') : null;
+const storedProfile = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_PROFILE) : null;
 const initialProfile: Profile = storedProfile
   ? JSON.parse(storedProfile)
   : {
@@ -23,6 +24,6 @@ export const updateProfile = (updates: Partial<Profile>) => {
 
   // Persist to localStorage
   if (typeof window !== 'undefined') {
-    localStorage.setItem('bolt_profile', JSON.stringify(profileStore.get()));
+    localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profileStore.get()));
   }
 };

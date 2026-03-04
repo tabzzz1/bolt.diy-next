@@ -4,6 +4,7 @@ import type { IProviderConfig } from '~/types/model';
 import type { TabVisibilityConfig, TabWindowConfig, UserTabConfig } from '~/components/@settings/core/types';
 import { DEFAULT_TAB_CONFIG } from '~/components/@settings/core/constants';
 import { toggleTheme } from './theme';
+import { STORAGE_KEY_PROVIDER_SETTINGS, STORAGE_KEY_AUTO_ENABLED_PROVIDERS, STORAGE_KEY_TAB_CONFIGURATION } from '~/lib/persistence/storageKeys';
 import { create } from 'zustand';
 
 export interface Shortcut {
@@ -50,10 +51,6 @@ export const shortcutsStore = map<Shortcuts>({
   },
 });
 
-// Create a single key for provider settings
-const PROVIDER_SETTINGS_KEY = 'provider_settings';
-const AUTO_ENABLED_KEY = 'auto_enabled_providers';
-
 // Add this helper function at the top of the file
 const isBrowser = typeof window !== 'undefined';
 
@@ -99,7 +96,7 @@ const getInitialProviderSettings = (): ProviderSetting => {
 
   // Only try to load from localStorage in the browser
   if (isBrowser) {
-    const savedSettings = localStorage.getItem(PROVIDER_SETTINGS_KEY);
+    const savedSettings = localStorage.getItem(STORAGE_KEY_PROVIDER_SETTINGS);
 
     if (savedSettings) {
       try {
@@ -127,8 +124,8 @@ const autoEnableConfiguredProviders = async () => {
   try {
     const configuredProviders = await fetchConfiguredProviders();
     const currentSettings = providersStore.get();
-    const savedSettings = localStorage.getItem(PROVIDER_SETTINGS_KEY);
-    const autoEnabledProviders = localStorage.getItem(AUTO_ENABLED_KEY);
+    const savedSettings = localStorage.getItem(STORAGE_KEY_PROVIDER_SETTINGS);
+    const autoEnabledProviders = localStorage.getItem(STORAGE_KEY_AUTO_ENABLED_PROVIDERS);
 
     // Track which providers were auto-enabled to avoid overriding user preferences
     const previouslyAutoEnabled = autoEnabledProviders ? JSON.parse(autoEnabledProviders) : [];
@@ -170,11 +167,11 @@ const autoEnableConfiguredProviders = async () => {
       providersStore.set(currentSettings);
 
       // Save to localStorage
-      localStorage.setItem(PROVIDER_SETTINGS_KEY, JSON.stringify(currentSettings));
+      localStorage.setItem(STORAGE_KEY_PROVIDER_SETTINGS, JSON.stringify(currentSettings));
 
       // Update the auto-enabled providers list
       const allAutoEnabled = [...new Set([...previouslyAutoEnabled, ...newlyAutoEnabled])];
-      localStorage.setItem(AUTO_ENABLED_KEY, JSON.stringify(allAutoEnabled));
+      localStorage.setItem(STORAGE_KEY_AUTO_ENABLED_PROVIDERS, JSON.stringify(allAutoEnabled));
 
       console.log(`Auto-enabled providers: ${newlyAutoEnabled.join(', ')}`);
     }
@@ -214,7 +211,7 @@ export const updateProviderSettings = (provider: string, settings: ProviderSetti
 
   // Save to localStorage
   const allSettings = providersStore.get();
-  localStorage.setItem(PROVIDER_SETTINGS_KEY, JSON.stringify(allSettings));
+  localStorage.setItem(STORAGE_KEY_PROVIDER_SETTINGS, JSON.stringify(allSettings));
 
   // If this is a local provider, update the auto-enabled tracking
   if (LOCAL_PROVIDERS.includes(provider) && updatedProvider.settings.enabled !== undefined) {
@@ -229,19 +226,19 @@ const updateAutoEnabledTracking = (providerName: string, isEnabled: boolean) => 
   }
 
   try {
-    const autoEnabledProviders = localStorage.getItem(AUTO_ENABLED_KEY);
+    const autoEnabledProviders = localStorage.getItem(STORAGE_KEY_AUTO_ENABLED_PROVIDERS);
     const currentAutoEnabled = autoEnabledProviders ? JSON.parse(autoEnabledProviders) : [];
 
     if (isEnabled) {
       // If user enables provider, add to auto-enabled list (for future detection)
       if (!currentAutoEnabled.includes(providerName)) {
         currentAutoEnabled.push(providerName);
-        localStorage.setItem(AUTO_ENABLED_KEY, JSON.stringify(currentAutoEnabled));
+        localStorage.setItem(STORAGE_KEY_AUTO_ENABLED_PROVIDERS, JSON.stringify(currentAutoEnabled));
       }
     } else {
       // If user disables provider, remove from auto-enabled list (respect user choice)
       const updatedAutoEnabled = currentAutoEnabled.filter((name: string) => name !== providerName);
-      localStorage.setItem(AUTO_ENABLED_KEY, JSON.stringify(updatedAutoEnabled));
+      localStorage.setItem(STORAGE_KEY_AUTO_ENABLED_PROVIDERS, JSON.stringify(updatedAutoEnabled));
     }
   } catch (error) {
     console.error('Error updating auto-enabled tracking:', error);
@@ -336,7 +333,7 @@ const getInitialTabConfiguration = (): TabWindowConfig => {
   }
 
   try {
-    const saved = localStorage.getItem('bolt_tab_configuration');
+    const saved = localStorage.getItem(STORAGE_KEY_TAB_CONFIGURATION);
 
     if (!saved) {
       return defaultConfig;
@@ -369,7 +366,7 @@ export const resetTabConfiguration = () => {
   };
 
   tabConfigurationStore.set(defaultConfig);
-  localStorage.setItem('bolt_tab_configuration', JSON.stringify(defaultConfig));
+  localStorage.setItem(STORAGE_KEY_TAB_CONFIGURATION, JSON.stringify(defaultConfig));
 };
 
 // First, let's define the SettingsStore interface

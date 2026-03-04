@@ -1,4 +1,5 @@
 import { json, type LoaderFunction, type LoaderFunctionArgs } from '@remix-run/cloudflare';
+import { STORAGE_KEY_GITHUB_CONNECTION, STORAGE_KEY_NETLIFY_CONNECTION } from '~/lib/persistence/storageKeys';
 
 /**
  * Diagnostic API for troubleshooting connection issues
@@ -41,8 +42,8 @@ export const loader: LoaderFunction = async ({ request, context }: LoaderFunctio
   // Get local storage status (this can only be checked client-side)
   const localStorageStatus = {
     explanation: 'Local storage can only be checked on the client side. Use browser devtools to check.',
-    githubKeysToCheck: ['github_connection'],
-    netlifyKeysToCheck: ['netlify_connection'],
+    githubKeysToCheck: [STORAGE_KEY_GITHUB_CONNECTION],
+    netlifyKeysToCheck: [STORAGE_KEY_NETLIFY_CONNECTION],
   };
 
   // Check if CORS might be an issue

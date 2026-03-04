@@ -1,4 +1,5 @@
 import { atom } from 'nanostores';
+import { STORAGE_KEY_SUPABASE_CONNECTION, STORAGE_KEY_SUPABASE_CREDENTIALS } from '~/lib/persistence/storageKeys';
 import type { SupabaseUser, SupabaseStats, SupabaseApiKey, SupabaseCredentials } from '~/types/supabase';
 
 export interface SupabaseProject {
@@ -58,8 +59,8 @@ const storage =
     ? globalThis.localStorage
     : null;
 
-const savedConnection = storage ? storage.getItem('supabase_connection') : null;
-const savedCredentials = storage ? storage.getItem('supabaseCredentials') : null;
+const savedConnection = storage ? storage.getItem(STORAGE_KEY_SUPABASE_CONNECTION) : null;
+const savedCredentials = storage ? storage.getItem(STORAGE_KEY_SUPABASE_CREDENTIALS) : null;
 
 const initialState: SupabaseConnectionState = savedConnection
   ? JSON.parse(savedConnection)
@@ -130,16 +131,16 @@ export function updateSupabaseConnection(connection: Partial<SupabaseConnectionS
    * Always save the connection state to localStorage to persist across chats
    */
   if (connection.user || connection.token || connection.selectedProjectId !== undefined || connection.credentials) {
-    storage?.setItem('supabase_connection', JSON.stringify(newState));
+    storage?.setItem(STORAGE_KEY_SUPABASE_CONNECTION, JSON.stringify(newState));
 
     if (newState.credentials) {
-      storage?.setItem('supabaseCredentials', JSON.stringify(newState.credentials));
+      storage?.setItem(STORAGE_KEY_SUPABASE_CREDENTIALS, JSON.stringify(newState.credentials));
     } else {
-      storage?.removeItem('supabaseCredentials');
+      storage?.removeItem(STORAGE_KEY_SUPABASE_CREDENTIALS);
     }
   } else {
-    storage?.removeItem('supabase_connection');
-    storage?.removeItem('supabaseCredentials');
+    storage?.removeItem(STORAGE_KEY_SUPABASE_CONNECTION);
+    storage?.removeItem(STORAGE_KEY_SUPABASE_CREDENTIALS);
   }
 }
 

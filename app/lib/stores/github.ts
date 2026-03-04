@@ -1,9 +1,10 @@
 import { atom } from 'nanostores';
+import { STORAGE_KEY_GITHUB_CONNECTION } from '~/lib/persistence/storageKeys';
 import type { GitHubConnection } from '~/types/GitHub';
 import { logStore } from './logs';
 
 // Initialize with stored connection or defaults
-const storedConnection = typeof window !== 'undefined' ? localStorage.getItem('github_connection') : null;
+const storedConnection = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_GITHUB_CONNECTION) : null;
 const initialConnection: GitHubConnection = storedConnection
   ? JSON.parse(storedConnection)
   : {
@@ -50,7 +51,7 @@ export async function initializeGitHubConnection() {
 
     // Store in localStorage for persistence
     if (typeof window !== 'undefined') {
-      localStorage.setItem('github_connection', JSON.stringify(connectionData));
+      localStorage.setItem(STORAGE_KEY_GITHUB_CONNECTION, JSON.stringify(connectionData));
     }
 
     // Update the store
@@ -131,6 +132,6 @@ export const updateGitHubConnection = (updates: Partial<GitHubConnection>) => {
 
   // Persist to localStorage
   if (typeof window !== 'undefined') {
-    localStorage.setItem('github_connection', JSON.stringify(newState));
+    localStorage.setItem(STORAGE_KEY_GITHUB_CONNECTION, JSON.stringify(newState));
   }
 };

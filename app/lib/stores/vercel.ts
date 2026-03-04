@@ -1,4 +1,5 @@
 import { atom } from 'nanostores';
+import { STORAGE_KEY_VERCEL_CONNECTION } from '~/lib/persistence/storageKeys';
 import type { VercelConnection } from '~/types/vercel';
 import { logStore } from './logs';
 import { toast } from 'react-toastify';
@@ -7,7 +8,7 @@ import { toast } from 'react-toastify';
 const envToken = import.meta.env?.VITE_VERCEL_ACCESS_TOKEN;
 
 // Initialize with stored connection or defaults
-const storedConnection = typeof window !== 'undefined' ? localStorage.getItem('vercel_connection') : null;
+const storedConnection = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_VERCEL_CONNECTION) : null;
 let initialConnection: VercelConnection;
 
 if (storedConnection) {
@@ -19,7 +20,7 @@ if (storedConnection) {
       console.log('Vercel store: Clearing incomplete saved connection, using env token');
 
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('vercel_connection');
+        localStorage.removeItem(STORAGE_KEY_VERCEL_CONNECTION);
       }
 
       initialConnection = {
@@ -57,7 +58,7 @@ export const updateVercelConnection = (updates: Partial<VercelConnection>) => {
 
   // Persist to localStorage
   if (typeof window !== 'undefined') {
-    localStorage.setItem('vercel_connection', JSON.stringify(newState));
+    localStorage.setItem(STORAGE_KEY_VERCEL_CONNECTION, JSON.stringify(newState));
   }
 };
 

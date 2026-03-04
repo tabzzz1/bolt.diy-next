@@ -1,9 +1,11 @@
 import { createScopedLogger } from '~/utils/logger';
+import { STORAGE_KEY_LOCKED_FILES } from '~/lib/persistence/storageKeys';
 
 const logger = createScopedLogger('LockedFiles');
 
 // Key for storing locked files in localStorage
-export const LOCKED_FILES_KEY = 'bolt.lockedFiles';
+/** @deprecated 请直接使用 STORAGE_KEY_LOCKED_FILES */
+export const LOCKED_FILES_KEY = STORAGE_KEY_LOCKED_FILES;
 
 export interface LockedItem {
   chatId: string; // Chat ID to scope locks to a specific project

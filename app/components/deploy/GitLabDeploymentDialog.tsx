@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { classNames } from '~/utils/classNames';
 import { getLocalStorage } from '~/lib/persistence/localStorage';
+import { STORAGE_KEY_GITLAB_CONNECTION } from '~/lib/persistence/storageKeys';
 import type { GitLabUserResponse, GitLabProjectInfo } from '~/types/GitLab';
 import { logStore } from '~/lib/stores/logs';
 import { chatId } from '~/lib/persistence/useChatHistory';
@@ -38,7 +39,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
   // Load GitLab connection on mount
   useEffect(() => {
     if (isOpen) {
-      const connection = getLocalStorage('gitlab_connection');
+      const connection = getLocalStorage(STORAGE_KEY_GITLAB_CONNECTION);
 
       // Set a default repository name based on the project name
       setRepoName(projectName.replace(/\s+/g, '-').toLowerCase());
@@ -102,7 +103,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const connection = getLocalStorage('gitlab_connection');
+    const connection = getLocalStorage(STORAGE_KEY_GITLAB_CONNECTION);
 
     if (!connection?.token || !connection?.user) {
       toast.error('Please connect your GitLab account in Settings > Connections first');
@@ -252,7 +253,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
     setShowAuthDialog(false);
 
     // Refresh user data after auth
-    const connection = getLocalStorage('gitlab_connection');
+    const connection = getLocalStorage(STORAGE_KEY_GITLAB_CONNECTION);
 
     if (connection?.user && connection?.token) {
       setUser(connection.user);

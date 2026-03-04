@@ -7,6 +7,7 @@ import { path } from '~/utils/path';
 import { useState } from 'react';
 import type { ActionCallbackData } from '~/lib/runtime/message-parser';
 import { chatId } from '~/lib/persistence/useChatHistory';
+import { storageKeyNetlifySite } from '~/lib/persistence/storageKeys';
 import { formatBuildFailureOutput } from './deployUtils';
 
 export function useNetlifyDeploy() {
@@ -140,7 +141,7 @@ export function useNetlifyDeploy() {
       const fileContents = await getAllFiles(finalBuildPath);
 
       // Use chatId instead of artifact.id
-      const existingSiteId = localStorage.getItem(`netlify-site-${currentChatId}`);
+      const existingSiteId = localStorage.getItem(storageKeyNetlifySite(currentChatId));
 
       const response = await fetch('/api/netlify-deploy', {
         method: 'POST',
@@ -218,7 +219,7 @@ export function useNetlifyDeploy() {
 
       // Store the site ID if it's a new site
       if (data.site) {
-        localStorage.setItem(`netlify-site-${currentChatId}`, data.site.id);
+        localStorage.setItem(storageKeyNetlifySite(currentChatId), data.site.id);
       }
 
       // Notify that deployment completed successfully
