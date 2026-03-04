@@ -68,9 +68,12 @@ export function HistoryItem({
   return (
     <div
       className={classNames(
-        'group rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50/80 dark:hover:bg-gray-800/30 overflow-hidden flex justify-between items-center px-3 py-2 transition-colors',
-        { 'text-gray-900 dark:text-white bg-gray-50/80 dark:bg-gray-800/30': isActiveChat },
-        { 'cursor-pointer': selectionMode },
+        'group rounded-lg text-sm overflow-hidden flex items-center transition-all border-l-2',
+        'hover:bg-gray-50 dark:hover:bg-gray-800/40',
+        isActiveChat
+          ? 'border-l-purple-500 bg-purple-50/50 dark:bg-purple-500/5 text-gray-900 dark:text-white pl-2.5 pr-3 py-2'
+          : 'border-l-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-3 py-2',
+        selectionMode ? 'cursor-pointer' : '',
       )}
       onClick={selectionMode ? handleItemClick : undefined}
     >
@@ -118,7 +121,7 @@ export function HistoryItem({
           >
             <div className="flex items-center gap-2.5 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
               <ChatActionButton
-                toolTipContent="Export"
+                toolTipContent="导出"
                 icon="i-ph:download-simple h-4 w-4"
                 onClick={(event) => {
                   event.preventDefault();
@@ -127,7 +130,7 @@ export function HistoryItem({
               />
               {onDuplicate && (
                 <ChatActionButton
-                  toolTipContent="Duplicate"
+                  toolTipContent="复制"
                   icon="i-ph:copy h-4 w-4"
                   onClick={(event) => {
                     event.preventDefault();
@@ -136,7 +139,7 @@ export function HistoryItem({
                 />
               )}
               <ChatActionButton
-                toolTipContent="Rename"
+                toolTipContent="重命名"
                 icon="i-ph:pencil-fill h-4 w-4"
                 onClick={(event) => {
                   event.preventDefault();
@@ -144,7 +147,7 @@ export function HistoryItem({
                 }}
               />
               <ChatActionButton
-                toolTipContent="Delete"
+                toolTipContent="删除"
                 icon="i-ph:trash h-4 w-4"
                 className="hover:text-red-500 dark:hover:text-red-400"
                 onClick={handleDeleteClick}

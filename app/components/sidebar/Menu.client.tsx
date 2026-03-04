@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Dialog, DialogButton, DialogDescription, DialogRoot, DialogTitle } from '~/components/ui/Dialog';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
@@ -14,6 +14,7 @@ import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
+import { isSidebarOpen } from '~/lib/stores/sidebar';
 
 const menuVariants = {
   closed: {
@@ -41,7 +42,7 @@ type DialogContent =
   | { type: 'bulkDelete'; items: ChatHistoryItem[] }
   | null;
 
-function CurrentDateTime() {
+function CurrentDateTimeInline() {
   const [dateTime, setDateTime] = useState(new Date());
 
   useEffect(() => {
@@ -53,21 +54,16 @@ function CurrentDateTime() {
   }, []);
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800/50">
-      <div className="h-4 w-4 i-ph:clock opacity-80" />
-      <div className="flex gap-2">
-        <span>{dateTime.toLocaleDateString()}</span>
-        <span>{dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-      </div>
-    </div>
+    <span className="text-xs text-gray-400 dark:text-gray-500 leading-tight">
+      {dateTime.toLocaleDateString()} · {dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+    </span>
   );
 }
 
 export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
-  const menuRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
-  const [open, setOpen] = useState(false);
+  const open = useStore(isSidebarOpen);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const profile = useStore(profileStore);
@@ -120,7 +116,7 @@ export const Menu = () => {
 
       deleteChat(item.id)
         .then(() => {
-          toast.success('Chat deleted successfully', {
+          toast.success('对话已成功删除', {
             position: 'bottom-right',
             autoClose: 3000,
           });
@@ -136,7 +132,7 @@ export const Menu = () => {
         })
         .catch((error) => {
           console.error('Failed to delete chat:', error);
-          toast.error('Failed to delete conversation', {
+          toast.error('删除对话失败', {
             position: 'bottom-right',
             autoClose: 3000,
           });
@@ -179,9 +175,9 @@ export const Menu = () => {
 
       // Show appropriate toast message
       if (errors.length === 0) {
-        toast.success(`${deletedCount} chat${deletedCount === 1 ? '' : 's'} deleted successfully`);
+        toast.success(`已成功删除 ${deletedCount} 条对话`);
       } else {
-        toast.warning(`Deleted ${deletedCount} of ${itemsToDeleteIds.length} chats. ${errors.length} failed.`, {
+        toast.warning(`已删除 ${deletedCount}/${itemsToDeleteIds.length} 条对话，${errors.length} 条删除失败`, {
           autoClose: 5000,
         });
       }
@@ -226,14 +222,14 @@ export const Menu = () => {
 
   const handleBulkDeleteClick = useCallback(() => {
     if (selectedItems.length === 0) {
-      toast.info('Select at least one chat to delete');
+      toast.info('请至少选择一条对话后再删除');
       return;
     }
 
     const selectedChats = list.filter((item) => selectedItems.includes(item.id));
 
     if (selectedChats.length === 0) {
-      toast.error('Could not find selected chats');
+      toast.error('未找到所选对话');
       return;
     }
 
@@ -278,31 +274,6 @@ export const Menu = () => {
     }
   }, [open, selectionMode]);
 
-  useEffect(() => {
-    const enterThreshold = 20;
-    const exitThreshold = 20;
-
-    function onMouseMove(event: MouseEvent) {
-      if (isSettingsOpen) {
-        return;
-      }
-
-      if (event.pageX < enterThreshold) {
-        setOpen(true);
-      }
-
-      if (menuRef.current && event.clientX > menuRef.current.getBoundingClientRect().right + exitThreshold) {
-        setOpen(false);
-      }
-    }
-
-    window.addEventListener('mousemove', onMouseMove);
-
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-    };
-  }, [isSettingsOpen]);
-
   const handleDuplicate = async (id: string) => {
     await duplicateCurrentChat(id);
     loadEntries(); // Reload the list after duplication
@@ -310,7 +281,7 @@ export const Menu = () => {
 
   const handleSettingsClick = () => {
     setIsSettingsOpen(true);
-    setOpen(false);
+    isSidebarOpen.set(false);
   };
 
   const handleSettingsClose = () => {
@@ -324,84 +295,97 @@ export const Menu = () => {
 
   return (
     <>
+      {open && (
+        <div
+          className="fixed inset-x-0 bottom-0 top-[var(--header-height)] z-sidebar-backdrop"
+          onClick={() => isSidebarOpen.set(false)}
+        />
+      )}
       <motion.div
-        ref={menuRef}
         initial="closed"
         animate={open ? 'open' : 'closed'}
         variants={menuVariants}
         style={{ width: '340px' }}
         className={classNames(
-          'flex selection-accent flex-col side-menu fixed top-0 h-full rounded-r-2xl',
-          'bg-white dark:bg-gray-950 border-r border-bolt-elements-borderColor',
-          'shadow-sm text-sm',
+          'flex selection-accent flex-col side-menu fixed top-[var(--header-height)] h-[calc(100vh-var(--header-height))] rounded-br-2xl',
+          'bg-white dark:bg-gray-950 border-r border-b border-bolt-elements-borderColor',
+          'shadow-xl text-sm',
           isSettingsOpen ? 'z-40' : 'z-sidebar',
         )}
       >
-        <div className="h-12 flex items-center justify-between px-4 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-900/50 rounded-tr-2xl">
-          <div className="text-gray-900 dark:text-white font-medium"></div>
+        {/* 顶部用户信息区 */}
+        <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800/50">
           <div className="flex items-center gap-3">
-            <HelpButton onClick={() => window.open('https://stackblitz-labs.github.io/bolt.diy/', '_blank')} />
-            <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
-              {profile?.username || 'Guest User'}
-            </span>
-            <div className="flex items-center justify-center w-[32px] h-[32px] overflow-hidden bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-500 rounded-full shrink-0">
+            <div className="flex items-center justify-center w-9 h-9 overflow-hidden bg-purple-50 dark:bg-purple-500/10 text-purple-500 dark:text-purple-400 rounded-xl shrink-0">
               {profile?.avatar ? (
                 <img
                   src={profile.avatar}
-                  alt={profile?.username || 'User'}
+                  alt={profile?.username || '用户'}
                   className="w-full h-full object-cover"
                   loading="eager"
                   decoding="sync"
                 />
               ) : (
-                <div className="i-ph:user-fill text-lg" />
+                <div className="i-ph:user-fill text-base" />
               )}
             </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">
+                {profile?.username || '访客用户'}
+              </div>
+              <CurrentDateTimeInline />
+            </div>
+            <HelpButton onClick={() => window.open('https://stackblitz-labs.github.io/bolt.diy/', '_blank')} />
           </div>
         </div>
-        <CurrentDateTime />
+
         <div className="flex-1 flex flex-col h-full w-full overflow-hidden">
-          <div className="p-4 space-y-3">
+          {/* 操作区：新建 + 选择 + 搜索 */}
+          <div className="p-3 space-y-2 border-b border-gray-100 dark:border-gray-800/50">
             <div className="flex gap-2">
               <a
                 href="/"
-                className="flex-1 flex gap-2 items-center bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 rounded-lg px-4 py-2 transition-colors"
+                className="flex-1 flex gap-2 items-center justify-center bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white rounded-lg px-4 py-2.5 transition-colors font-medium shadow-sm"
               >
-                <span className="inline-block i-ph:plus-circle h-4 w-4" />
-                <span className="text-sm font-medium">Start new chat</span>
+                <span className="inline-block i-ph:plus-bold h-4 w-4" />
+                <span className="text-sm">新建对话</span>
               </a>
               <button
                 onClick={toggleSelectionMode}
                 className={classNames(
-                  'flex gap-1 items-center rounded-lg px-3 py-2 transition-colors',
+                  'flex items-center justify-center w-10 rounded-lg transition-colors shrink-0',
                   selectionMode
-                    ? 'bg-purple-600 dark:bg-purple-500 text-white border border-purple-700 dark:border-purple-600'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700',
+                    ? 'bg-purple-600 dark:bg-purple-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700',
                 )}
-                aria-label={selectionMode ? 'Exit selection mode' : 'Enter selection mode'}
+                aria-label={selectionMode ? '退出选择模式' : '进入选择模式'}
               >
                 <span className={selectionMode ? 'i-ph:x h-4 w-4' : 'i-ph:check-square h-4 w-4'} />
               </button>
             </div>
-            <div className="relative w-full">
+            <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <span className="i-ph:magnifying-glass h-4 w-4 text-gray-400 dark:text-gray-500" />
+                <div className="i-ph:magnifying-glass h-4 w-4 text-gray-400 dark:text-gray-500" />
               </div>
               <input
-                className="w-full bg-gray-50 dark:bg-gray-900 relative pl-9 pr-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500/50 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-800"
+                className="w-full bg-gray-50 dark:bg-gray-900 pl-9 pr-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500/50 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 border border-gray-200 dark:border-gray-800 transition-colors"
                 type="search"
-                placeholder="Search chats..."
+                placeholder="搜索对话..."
                 onChange={handleSearchChange}
-                aria-label="Search chats"
+                aria-label="搜索对话"
               />
             </div>
           </div>
-          <div className="flex items-center justify-between text-sm px-4 py-2">
-            <div className="font-medium text-gray-600 dark:text-gray-400">Your Chats</div>
+
+          {/* 列表标题行 */}
+          <div className="flex items-center justify-between px-4 pt-3 pb-1.5">
+            <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-600 uppercase tracking-widest">
+              我的对话
+            </span>
             {selectionMode && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Button variant="ghost" size="sm" onClick={selectAll}>
-                  {selectedItems.length === filteredList.length ? 'Deselect all' : 'Select all'}
+                  {selectedItems.length === filteredList.length ? '取消全选' : '全选'}
                 </Button>
                 <Button
                   variant="destructive"
@@ -409,24 +393,29 @@ export const Menu = () => {
                   onClick={handleBulkDeleteClick}
                   disabled={selectedItems.length === 0}
                 >
-                  Delete selected
+                  删除所选
                 </Button>
               </div>
             )}
           </div>
-          <div className="flex-1 overflow-auto px-3 pb-3">
+
+          {/* 对话列表 */}
+          <div className="flex-1 overflow-auto px-2 pb-2">
             {filteredList.length === 0 && (
-              <div className="px-4 text-gray-500 dark:text-gray-400 text-sm">
-                {list.length === 0 ? 'No previous conversations' : 'No matches found'}
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="i-ph:chat-circle-dots text-4xl text-gray-200 dark:text-gray-800 mb-2" />
+                <p className="text-sm text-gray-400 dark:text-gray-600">
+                  {list.length === 0 ? '暂无历史对话' : '未找到匹配内容'}
+                </p>
               </div>
             )}
             <DialogRoot open={dialogContent !== null}>
               {binDates(filteredList).map(({ category, items }) => (
-                <div key={category} className="mt-2 first:mt-0 space-y-1">
-                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 sticky top-0 z-1 bg-white dark:bg-gray-950 px-4 py-1">
+                <div key={category} className="mt-3 first:mt-1 space-y-0.5">
+                  <div className="text-[10px] font-semibold text-gray-400 dark:text-gray-600 uppercase tracking-widest sticky top-0 z-1 bg-white dark:bg-gray-950 px-3 py-1">
                     {category}
                   </div>
-                  <div className="space-y-0.5 pr-1">
+                  <div>
                     {items.map((item) => (
                       <HistoryItem
                         key={item.id}
@@ -451,20 +440,20 @@ export const Menu = () => {
                 {dialogContent?.type === 'delete' && (
                   <>
                     <div className="p-6 bg-white dark:bg-gray-950">
-                      <DialogTitle className="text-gray-900 dark:text-white">Delete Chat?</DialogTitle>
+                      <DialogTitle className="text-gray-900 dark:text-white">确定删除对话？</DialogTitle>
                       <DialogDescription className="mt-2 text-gray-600 dark:text-gray-400">
                         <p>
-                          You are about to delete{' '}
+                          即将删除对话{' '}
                           <span className="font-medium text-gray-900 dark:text-white">
                             {dialogContent.item.description}
                           </span>
                         </p>
-                        <p className="mt-2">Are you sure you want to delete this chat?</p>
+                        <p className="mt-2">确定要删除这条对话吗？</p>
                       </DialogDescription>
                     </div>
                     <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
                       <DialogButton type="secondary" onClick={closeDialog}>
-                        Cancel
+                        取消
                       </DialogButton>
                       <DialogButton
                         type="danger"
@@ -474,7 +463,7 @@ export const Menu = () => {
                           closeDialog();
                         }}
                       >
-                        Delete
+                        删除
                       </DialogButton>
                     </div>
                   </>
@@ -482,12 +471,9 @@ export const Menu = () => {
                 {dialogContent?.type === 'bulkDelete' && (
                   <>
                     <div className="p-6 bg-white dark:bg-gray-950">
-                      <DialogTitle className="text-gray-900 dark:text-white">Delete Selected Chats?</DialogTitle>
+                      <DialogTitle className="text-gray-900 dark:text-white">确定删除所选对话？</DialogTitle>
                       <DialogDescription className="mt-2 text-gray-600 dark:text-gray-400">
-                        <p>
-                          You are about to delete {dialogContent.items.length}{' '}
-                          {dialogContent.items.length === 1 ? 'chat' : 'chats'}:
-                        </p>
+                        <p>即将删除以下 {dialogContent.items.length} 条对话：</p>
                         <div className="mt-2 max-h-32 overflow-auto border border-gray-100 dark:border-gray-800 rounded-md bg-gray-50 dark:bg-gray-900 p-2">
                           <ul className="list-disc pl-5 space-y-1">
                             {dialogContent.items.map((item) => (
@@ -497,12 +483,12 @@ export const Menu = () => {
                             ))}
                           </ul>
                         </div>
-                        <p className="mt-3">Are you sure you want to delete these chats?</p>
+                        <p className="mt-3">确定要删除这些对话吗？</p>
                       </DialogDescription>
                     </div>
                     <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
                       <DialogButton type="secondary" onClick={closeDialog}>
-                        Cancel
+                        取消
                       </DialogButton>
                       <DialogButton
                         type="danger"
@@ -517,7 +503,7 @@ export const Menu = () => {
                           closeDialog();
                         }}
                       >
-                        Delete
+                        删除
                       </DialogButton>
                     </div>
                   </>
@@ -525,10 +511,10 @@ export const Menu = () => {
               </Dialog>
             </DialogRoot>
           </div>
-          <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 px-4 py-3">
-            <div className="flex items-center gap-3">
-              <SettingsButton onClick={handleSettingsClick} />
-            </div>
+
+          {/* 底部工具栏 */}
+          <div className="flex items-center justify-between px-3 py-2.5 border-t border-gray-100 dark:border-gray-800/50 bg-gray-50/80 dark:bg-gray-900/50">
+            <SettingsButton onClick={handleSettingsClick} />
             <ThemeSwitch />
           </div>
         </div>
