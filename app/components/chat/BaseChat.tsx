@@ -595,15 +595,16 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         data-chat-visible={showChat}
       >
         <ClientOnly>{() => <Menu />}</ClientOnly>
-        <div className="flex w-full h-full overflow-hidden">
+        <div className={classNames('flex w-full h-full', { 'overflow-y-auto modern-scrollbar': !chatStarted, 'overflow-hidden': chatStarted })}>
           <div
             ref={chatPanelRef}
             className={classNames(
               styles.Chat,
-              'flex flex-col h-full overflow-hidden transition-[width] duration-300 ease-in-out',
+              'flex flex-col h-full transition-[width] duration-300 ease-in-out',
               {
                 'flex-grow': !chatStarted,
                 'flex-shrink-0': chatStarted,
+                'overflow-hidden': chatStarted,
               },
             )}
             style={chatStarted ? { width: isChatCollapsed ? '0px' : 'var(--chat-min-width)' } : undefined}
