@@ -17,6 +17,7 @@ import type {
 } from '@ai-sdk/ui-utils';
 import { ToolInvocations } from './ToolInvocations';
 import type { ToolCallAnnotation } from '~/types/context';
+import { useTranslation } from 'react-i18next';
 
 interface AssistantMessageProps {
   content: string;
@@ -74,6 +75,8 @@ export const AssistantMessage = memo(
     parts,
     addToolResult,
   }: AssistantMessageProps) => {
+    const { t } = useTranslation('chat');
+
     const filteredAnnotations = (annotations?.filter(
       (annotation: JSONValue) =>
         annotation && typeof annotation === 'object' && Object.keys(annotation).includes('type'),
@@ -104,10 +107,24 @@ export const AssistantMessage = memo(
 
     return (
       <div className="overflow-hidden w-full">
-        <>
-          <div className=" flex gap-2 items-center text-sm text-bolt-elements-textSecondary mb-2">
+        {/* Assistant header row */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            {/* AI icon */}
+            <div className="w-6 h-6 rounded-full bg-accent-500/15 flex items-center justify-center flex-shrink-0">
+              <div className="i-ph:robot text-accent-500 text-xs" />
+            </div>
+            <span className="text-xs font-medium text-bolt-elements-textSecondary">{t('assistantLabel')}</span>
+
+            {/* Context info popover */}
             {(codeContext || chatSummary) && (
-              <Popover side="right" align="start" trigger={<div className="i-ph:info" />}>
+              <Popover
+                side="right"
+                align="start"
+                trigger={
+                  <div className="i-ph:info text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary transition-colors cursor-pointer text-sm" />
+                }
+              >
                 {chatSummary && (
                   <div className="max-w-chat">
                     <div className="summary max-h-96 flex flex-col">
@@ -145,47 +162,64 @@ export const AssistantMessage = memo(
                 <div className="context"></div>
               </Popover>
             )}
-            <div className="flex w-full items-center justify-between">
-              {usage && (
-                <div>
-                  Tokens: {usage.totalTokens} (prompt: {usage.promptTokens}, completion: {usage.completionTokens})
-                </div>
-              )}
-              {(onRewind || onFork) && messageId && (
-                <div className="flex gap-2 flex-col lg:flex-row ml-auto">
-                  {onRewind && (
-                    <WithTooltip tooltip="Revert to this message">
-                      <button
-                        onClick={() => onRewind(messageId)}
-                        key="i-ph:arrow-u-up-left"
-                        className="i-ph:arrow-u-up-left text-xl text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary transition-colors"
-                      />
-                    </WithTooltip>
-                  )}
-                  {onFork && (
-                    <WithTooltip tooltip="Fork chat from this message">
-                      <button
-                        onClick={() => onFork(messageId)}
-                        key="i-ph:git-fork"
-                        className="i-ph:git-fork text-xl text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary transition-colors"
-                      />
-                    </WithTooltip>
-                  )}
-                </div>
-              )}
-            </div>
           </div>
-        </>
-        <Markdown append={append} chatMode={chatMode} setChatMode={setChatMode} model={model} provider={provider} html>
-          {content}
-        </Markdown>
-        {toolInvocations && toolInvocations.length > 0 && (
-          <ToolInvocations
-            toolInvocations={toolInvocations}
-            toolCallAnnotations={toolCallAnnotations}
-            addToolResult={addToolResult}
-          />
-        )}
+
+          {/* Right side: token usage + action buttons */}
+          <div className="flex items-center gap-3">
+            {usage && (
+              <div className="flex items-center gap-1 text-xs text-bolt-elements-textTertiary bg-bolt-elements-background-depth-2 px-2 py-0.5 rounded-full border border-bolt-elements-borderColor/40">
+                <div className="i-ph:coins text-xs" />
+                <span>{t('tokenCount', { count: usage.totalTokens })}</span>
+              </div>
+            )}
+
+            {(onRewind || onFork) && messageId && (
+              <div className="flex items-center gap-1">
+                {onRewind && (
+                  <WithTooltip tooltip={t('rewindTooltip')}>
+                    <button
+                      onClick={() => onRewind(messageId)}
+                      className="w-6 h-6 flex items-center justify-center rounded-md text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:bg-bolt-elements-background-depth-2 transition-all cursor-pointer"
+                    >
+                      <div className="i-ph:arrow-u-up-left text-sm" />
+                    </button>
+                  </WithTooltip>
+                )}
+                {onFork && (
+                  <WithTooltip tooltip={t('forkTooltip')}>
+                    <button
+                      onClick={() => onFork(messageId)}
+                      className="w-6 h-6 flex items-center justify-center rounded-md text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:bg-bolt-elements-background-depth-2 transition-all cursor-pointer"
+                    >
+                      <div className="i-ph:git-fork text-sm" />
+                    </button>
+                  </WithTooltip>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Message content */}
+        <div className="pl-8">
+          <Markdown
+            append={append}
+            chatMode={chatMode}
+            setChatMode={setChatMode}
+            model={model}
+            provider={provider}
+            html
+          >
+            {content}
+          </Markdown>
+          {toolInvocations && toolInvocations.length > 0 && (
+            <ToolInvocations
+              toolInvocations={toolInvocations}
+              toolCallAnnotations={toolCallAnnotations}
+              addToolResult={addToolResult}
+            />
+          )}
+        </div>
       </div>
     );
   },

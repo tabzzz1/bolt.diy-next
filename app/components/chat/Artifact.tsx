@@ -2,6 +2,7 @@ import { useStore } from '@nanostores/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { computed } from 'nanostores';
 import { memo, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createHighlighter, type BundledLanguage, type BundledTheme, type HighlighterGeneric } from 'shiki';
 import type { ActionState } from '~/lib/runtime/action-runner';
 import { workbenchStore } from '~/lib/stores/workbench';
@@ -27,6 +28,7 @@ interface ArtifactProps {
 }
 
 export const Artifact = memo(({ artifactId }: ArtifactProps) => {
+  const { t } = useTranslation('chat');
   const userToggledActions = useRef(false);
   const [showActions, setShowActions] = useState(false);
   const [allActionFinished, setAllActionFinished] = useState(false);
@@ -70,12 +72,12 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
     artifact?.type === 'bundled'
       ? allActionFinished
         ? artifact.id === 'restored-project-setup'
-          ? 'Project Restored' // Title when restore is complete
-          : 'Project Created' // Title when initial creation is complete
+          ? t('artifact.projectRestored')
+          : t('artifact.projectCreated')
         : artifact.id === 'restored-project-setup'
-          ? 'Restoring Project...' // Title during restore
-          : 'Creating Project...' // Title during initial creation
-      : artifact?.title; // Fallback to original title for non-bundled or if artifact is missing
+          ? t('artifact.restoringProject')
+          : t('artifact.creatingProject')
+      : artifact?.title;
 
   return (
     <>
@@ -84,8 +86,8 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
           <button
             className="flex items-stretch bg-bolt-elements-artifacts-background hover:bg-bolt-elements-artifacts-backgroundHover w-full overflow-hidden"
             onClick={() => {
-              const showWorkbench = workbenchStore.showWorkbench.get();
-              workbenchStore.showWorkbench.set(!showWorkbench);
+              workbenchStore.showWorkbench.set(true);
+              workbenchStore.currentView.set('code');
             }}
           >
             <div className="px-5 p-3.5 w-full text-left">
@@ -94,7 +96,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
                 {dynamicTitle}
               </div>
               <div className="w-full w-full text-bolt-elements-textSecondary text-xs mt-0.5">
-                Click to open Workbench
+                {t('artifact.clickToOpen')}
               </div>
             </div>
           </button>
@@ -126,12 +128,11 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
               )}
             </div>
             <div className="text-bolt-elements-textPrimary font-medium leading-5 text-sm">
-              {/* This status text remains the same */}
               {allActionFinished
                 ? artifact.id === 'restored-project-setup'
-                  ? 'Restore files from snapshot'
-                  : 'Initial files created'
-                : 'Creating initial files'}
+                  ? t('artifact.restoreFilesFromSnapshot')
+                  : t('artifact.initialFilesCreated')
+                : t('artifact.creatingInitialFiles')}
             </div>
           </div>
         )}
@@ -194,6 +195,8 @@ export function openArtifactInWorkbench(filePath: any) {
 }
 
 const ActionList = memo(({ actions }: ActionListProps) => {
+  const { t } = useTranslation('chat');
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
       <ul className="list-none space-y-2.5">
@@ -232,7 +235,7 @@ const ActionList = memo(({ actions }: ActionListProps) => {
                 </div>
                 {type === 'file' ? (
                   <div>
-                    Create{' '}
+                    {t('artifact.createFile')}{' '}
                     <code
                       className="bg-bolt-elements-artifacts-inlineCode-background text-bolt-elements-artifacts-inlineCode-text px-1.5 py-1 rounded-md text-bolt-elements-item-contentAccent hover:underline cursor-pointer"
                       onClick={() => openArtifactInWorkbench(action.filePath)}
@@ -242,7 +245,7 @@ const ActionList = memo(({ actions }: ActionListProps) => {
                   </div>
                 ) : type === 'shell' ? (
                   <div className="flex items-center w-full min-h-[28px]">
-                    <span className="flex-1">Run command</span>
+                    <span className="flex-1">{t('artifact.runCommand')}</span>
                   </div>
                 ) : type === 'start' ? (
                   <a
@@ -252,7 +255,7 @@ const ActionList = memo(({ actions }: ActionListProps) => {
                     }}
                     className="flex items-center w-full min-h-[28px]"
                   >
-                    <span className="flex-1">Start Application</span>
+                    <span className="flex-1">{t('artifact.startApplication')}</span>
                   </a>
                 ) : null}
               </div>

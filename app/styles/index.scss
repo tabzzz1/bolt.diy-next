@@ -14,6 +14,13 @@ body {
   background-color: var(--bolt-elements-bg-depth-1);
 }
 
+// Disable all CSS transitions while the resize divider is being dragged.
+// The workbench fixed panel has transition-[left,width] duration-200 which causes lag
+// and overlap because the panel takes 200ms to reach its new position.
+html[data-resizing] * {
+  transition: none !important;
+}
+
 :root {
   --gradient-opacity: 0.8;
   --primary-color: rgba(158, 117, 240, var(--gradient-opacity));

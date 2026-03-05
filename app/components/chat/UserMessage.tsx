@@ -22,6 +22,26 @@ interface UserMessageProps {
     | undefined;
 }
 
+function UserAvatar({ profile }: { profile: any }) {
+  if (profile?.avatar) {
+    return (
+      <img
+        src={profile.avatar}
+        alt={profile?.username || 'User'}
+        className="w-7 h-7 object-cover rounded-full flex-shrink-0 ring-1 ring-bolt-elements-borderColor"
+        loading="eager"
+        decoding="sync"
+      />
+    );
+  }
+
+  return (
+    <div className="w-7 h-7 rounded-full bg-accent-500/20 flex items-center justify-center flex-shrink-0">
+      <div className="i-ph:user-fill text-accent-500 text-sm" />
+    </div>
+  );
+}
+
 export function UserMessage({ content, parts }: UserMessageProps) {
   const profile = useStore(profileStore);
 
@@ -36,26 +56,8 @@ export function UserMessage({ content, parts }: UserMessageProps) {
     const textContent = stripMetadata(textItem?.text || '');
 
     return (
-      <div className="overflow-hidden flex flex-col gap-3 items-center ">
-        <div className="flex flex-row items-start justify-center overflow-hidden shrink-0 self-start">
-          {profile?.avatar || profile?.username ? (
-            <div className="flex items-end gap-2">
-              <img
-                src={profile.avatar}
-                alt={profile?.username || 'User'}
-                className="w-[25px] h-[25px] object-cover rounded-full"
-                loading="eager"
-                decoding="sync"
-              />
-              <span className="text-bolt-elements-textPrimary text-sm">
-                {profile?.username ? profile.username : ''}
-              </span>
-            </div>
-          ) : (
-            <div className="i-ph:user-fill text-accent-500 text-2xl" />
-          )}
-        </div>
-        <div className="flex flex-col gap-4 bg-accent-500/10 backdrop-blur-sm p-3 py-3 w-auto rounded-lg mr-auto">
+      <div className="flex items-end justify-end gap-2 ml-auto max-w-[85%]">
+        <div className="flex flex-col gap-2 bg-bolt-elements-prompt-background border border-bolt-elements-borderColor/60 px-4 py-3 rounded-2xl rounded-br-md shadow-sm">
           {textContent && <Markdown html>{textContent}</Markdown>}
           {images.map((item, index) => (
             <img
@@ -67,6 +69,7 @@ export function UserMessage({ content, parts }: UserMessageProps) {
             />
           ))}
         </div>
+        <UserAvatar profile={profile} />
       </div>
     );
   }
@@ -74,23 +77,32 @@ export function UserMessage({ content, parts }: UserMessageProps) {
   const textContent = stripMetadata(content);
 
   return (
-    <div className="flex flex-col bg-accent-500/10 backdrop-blur-sm px-5 p-3.5 w-auto rounded-lg ml-auto">
-      <div className="flex gap-3.5 mb-4">
-        {images.map((item, index) => (
-          <div className="relative flex rounded-lg border border-bolt-elements-borderColor overflow-hidden">
-            <div className="h-16 w-16 bg-transparent outline-none">
-              <img
+    <div className="flex items-end justify-end gap-2 ml-auto max-w-[85%]">
+      <div className="flex flex-col gap-2">
+        {images.length > 0 && (
+          <div className="flex gap-2.5 justify-end mb-1">
+            {images.map((item, index) => (
+              <div
                 key={index}
-                src={`data:${item.mimeType};base64,${item.data}`}
-                alt={`Image ${index + 1}`}
-                className="h-full w-full rounded-lg"
-                style={{ objectFit: 'fill' }}
-              />
-            </div>
+                className="relative flex rounded-xl border border-bolt-elements-borderColor overflow-hidden shadow-sm"
+              >
+                <div className="h-20 w-20 bg-transparent outline-none">
+                  <img
+                    src={`data:${item.mimeType};base64,${item.data}`}
+                    alt={`Image ${index + 1}`}
+                    className="h-full w-full rounded-xl"
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+        <div className="bg-bolt-elements-prompt-background border border-bolt-elements-borderColor/60 px-4 py-3 rounded-2xl rounded-br-md shadow-sm">
+          <Markdown html>{textContent}</Markdown>
+        </div>
       </div>
-      <Markdown html>{textContent}</Markdown>
+      <UserAvatar profile={profile} />
     </div>
   );
 }

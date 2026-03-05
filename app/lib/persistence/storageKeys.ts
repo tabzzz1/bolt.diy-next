@@ -52,6 +52,20 @@ export const STORAGE_KEY_PROFILE = 'bolt_profile';
  */
 export const STORAGE_KEY_TAB_CONFIGURATION = 'bolt_tab_configuration';
 
+/**
+ * 聊天面板（左侧）的宽度，单位 px
+ * 值类型：数字字符串（如 '533'）
+ * 读写位置：app/components/chat/BaseChat.tsx
+ */
+export const STORAGE_KEY_CHAT_PANEL_WIDTH = 'bolt_chat_panel_width';
+
+/**
+ * 聊天面板（左侧）是否处于收起状态
+ * 值类型：'true' | 'false'
+ * 读写位置：app/components/chat/BaseChat.tsx
+ */
+export const STORAGE_KEY_CHAT_PANEL_COLLAPSED = 'bolt_chat_panel_collapsed';
+
 // ─────────────────────────────────────────────
 // 2. AI Provider 配置
 // ─────────────────────────────────────────────
