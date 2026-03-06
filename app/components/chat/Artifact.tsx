@@ -200,6 +200,8 @@ export function openArtifactInWorkbench(filePath: any) {
 
 const ActionList = memo(({ actions }: ActionListProps) => {
   const { t } = useTranslation('chat');
+  const previews = useStore(workbenchStore.previews);
+  const hasReadyPreview = previews.some((preview) => preview.ready);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
@@ -207,6 +209,8 @@ const ActionList = memo(({ actions }: ActionListProps) => {
         {actions.map((action, index) => {
           const { status, type, content } = action;
           const isLast = index === actions.length - 1;
+          const displayStatus: ActionState['status'] =
+            type === 'start' && status === 'running' && hasReadyPreview ? 'complete' : status;
 
           return (
             <motion.li
@@ -220,8 +224,8 @@ const ActionList = memo(({ actions }: ActionListProps) => {
               }}
             >
               <div className="flex items-center gap-1.5 text-sm">
-                <div className={classNames('text-lg', getIconColor(action.status))}>
-                  {status === 'running' ? (
+                <div className={classNames('text-lg', getIconColor(displayStatus))}>
+                  {displayStatus === 'running' ? (
                     <>
                       {type !== 'start' ? (
                         <div className="i-svg-spinners:90-ring-with-bg"></div>
@@ -229,11 +233,11 @@ const ActionList = memo(({ actions }: ActionListProps) => {
                         <div className="i-ph:terminal-window-duotone"></div>
                       )}
                     </>
-                  ) : status === 'pending' ? (
+                  ) : displayStatus === 'pending' ? (
                     <div className="i-ph:circle-duotone"></div>
-                  ) : status === 'complete' ? (
+                  ) : displayStatus === 'complete' ? (
                     <div className="i-ph:check"></div>
-                  ) : status === 'failed' || status === 'aborted' ? (
+                  ) : displayStatus === 'failed' || displayStatus === 'aborted' ? (
                     <div className="i-ph:x"></div>
                   ) : null}
                 </div>

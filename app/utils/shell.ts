@@ -221,20 +221,19 @@ export class BoltShell {
     }
 
     const state = this.executionState.get();
+    const hasActiveExecution = Boolean(state?.active);
 
-    if (state?.active && state.abort) {
-      state.abort();
-    }
+    if (hasActiveExecution) {
+      if (state?.abort) {
+        state.abort();
+      }
 
-    /*
-     * interrupt the current execution
-     *  this.#shellInputStream?.write('\x03');
-     */
-    this.terminal.input('\x03');
-    await this.waitTillOscCode('prompt');
+      this.terminal.input('\x03');
+      await this.waitTillOscCode('prompt');
 
-    if (state && state.executionPrms) {
-      await state.executionPrms;
+      if (state?.executionPrms) {
+        await state.executionPrms;
+      }
     }
 
     //start a new execution
@@ -259,7 +258,7 @@ export class BoltShell {
   }
 
   async getCurrentExecutionResult(): Promise<ExecutionResult> {
-    const { output, exitCode } = await this.waitTillOscCode('exit');
+    const { output, exitCode } = await this.waitTillOscCode('prompt');
     return { output, exitCode };
   }
 
@@ -304,14 +303,28 @@ export class BoltShell {
         buffer = buffer.slice(buffer.indexOf(expoUrlMatch[1]) + expoUrlMatch[1].length);
       }
 
-      // Check if command completion signal with exit code
-      const [, osc, , , code] = text.match(/\x1b\]654;([^\x07=]+)=?((-?\d+):(\d+))?\x07/) || [];
+      // Parse all OSC markers in this chunk, because a single chunk can contain multiple events
+      const oscRegex = /\x1b\]654;([^\x07=]+)=?((-?\d+):(\d+))?\x07/g;
+      let shouldStop = false;
 
-      if (osc === 'exit') {
-        exitCode = parseInt(code, 10);
+      for (const match of text.matchAll(oscRegex)) {
+        const osc = match[1];
+        const code = match[4];
+
+        if (osc === 'exit' && code !== undefined) {
+          const parsed = parseInt(code, 10);
+
+          if (!Number.isNaN(parsed)) {
+            exitCode = parsed;
+          }
+        }
+
+        if (osc === waitCode) {
+          shouldStop = true;
+        }
       }
 
-      if (osc === waitCode) {
+      if (shouldStop) {
         break;
       }
     }
