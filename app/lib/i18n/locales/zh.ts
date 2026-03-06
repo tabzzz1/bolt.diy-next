@@ -128,6 +128,9 @@ const zh = {
       importGitlabSubtitle: '将 GitLab 仓库克隆到工作区',
       cloneError: '导入仓库失败',
       cloningMsg: '正在克隆仓库，请稍候...',
+      cloningRepositoryMsg: '正在克隆仓库...',
+      cloningRepo: '正在克隆仓库 {{url}} 至 {{workdir}}',
+      gitProject: 'Git 项目：{{projectName}}',
     },
     starterTemplates: {
       orStartWith: '或使用你喜欢的技术栈从空白项目开始',
@@ -301,6 +304,12 @@ const zh = {
       codeFilesSelected: '代码文件已选定',
       generatingResponse: '正在生成回复',
       responseGenerated: '回复已生成',
+    },
+    folderImport: {
+      importFolder: '导入 "{{folderName}}" 文件夹',
+      fixAndStart: '初始化代码库并启动应用程序',
+      importedFiles: '我已导入 "{{folderName}}" 文件夹的内容。',
+      skippedBinaryFiles: '跳过 {{count}} 个二进制文件：',
     },
   },
 } as const;

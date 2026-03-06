@@ -1,12 +1,15 @@
 import type { Message } from 'ai';
 import { generateId } from './fileUtils';
 import { detectProjectCommands, createCommandsMessage, escapeBoltTags } from './projectCommands';
+import i18n from '~/lib/i18n/config';
 
 export const createChatFromFolder = async (
   files: File[],
   binaryFiles: string[],
   folderName: string,
 ): Promise<Message[]> => {
+  const t = i18n.getFixedT(null, 'chat');
+
   const fileArtifacts = await Promise.all(
     files.map(async (file) => {
       return new Promise<{ content: string; path: string }>((resolve, reject) => {
@@ -31,12 +34,12 @@ export const createChatFromFolder = async (
 
   const binaryFilesMessage =
     binaryFiles.length > 0
-      ? `\n\nSkipped ${binaryFiles.length} binary files:\n${binaryFiles.map((f) => `- ${f}`).join('\n')}`
+      ? `\n\n${t('folderImport.skippedBinaryFiles', { count: binaryFiles.length })}\n${binaryFiles.map((f) => `- ${f}`).join('\n')}`
       : '';
 
   const filesMessage: Message = {
     role: 'assistant',
-    content: `I've imported the contents of the "${folderName}" folder.${binaryFilesMessage}
+    content: `${t('folderImport.importedFiles', { folderName })}${binaryFilesMessage}
 
 <boltArtifact id="imported-files" title="Imported Files" type="bundled" >
 ${fileArtifacts
@@ -54,7 +57,7 @@ ${escapeBoltTags(file.content)}
   const userMessage: Message = {
     role: 'user',
     id: generateId(),
-    content: `Import the "${folderName}" folder`,
+    content: t('folderImport.importFolder', { folderName }),
     createdAt: new Date(),
   };
 
@@ -64,7 +67,7 @@ ${escapeBoltTags(file.content)}
     messages.push({
       role: 'user',
       id: generateId(),
-      content: 'Setup the codebase and Start the application',
+      content: t('folderImport.fixAndStart'),
     });
     messages.push(commandsMessage);
   }

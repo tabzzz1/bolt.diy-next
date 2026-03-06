@@ -76,8 +76,7 @@ export function GitUrlImport() {
 
           const filesMessage: Message = {
             role: 'assistant',
-            content: `Cloning the repo ${repoUrl} into ${workdir}
-<boltArtifact id="imported-files" title="Git Cloned Files"  type="bundled">
+            content: `${t('gitClone.cloningRepo', { url: repoUrl, workdir })}\n<boltArtifact id="imported-files" title="Git Cloned Files"  type="bundled">
 ${fileContents
   .map(
     (file) =>
@@ -97,12 +96,14 @@ ${escapeBoltTags(file.content)}
             messages.push({
               role: 'user',
               id: generateId(),
-              content: 'Setup the codebase and Start the application',
+              content: t('folderImport.fixAndStart'),
             });
             messages.push(commandsMessage);
           }
 
-          await importChat(`Git Project:${repoUrl.split('/').slice(-1)[0]}`, messages, { gitUrl: repoUrl });
+          await importChat(t('gitClone.gitProject', { projectName: repoUrl.split('/').slice(-1)[0] }), messages, {
+            gitUrl: repoUrl,
+          });
         }
       } catch (error) {
         console.error('Error during import:', error);
@@ -141,7 +142,7 @@ ${escapeBoltTags(file.content)}
       {() => (
         <>
           <Chat />
-          {loading && <LoadingOverlay message={t('gitClone.cloningMsg')} />}
+          {loading && <LoadingOverlay message={t('gitClone.cloningRepositoryMsg')} />}
         </>
       )}
     </ClientOnly>

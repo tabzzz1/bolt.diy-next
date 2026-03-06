@@ -130,6 +130,9 @@ const en = {
       importGitlabSubtitle: 'Clone a repository from GitLab to your workspace',
       cloneError: 'Failed to import repository',
       cloningMsg: 'Please wait while we clone the repository...',
+      cloningRepositoryMsg: 'Cloning repository...',
+      cloningRepo: 'Cloning the repo {{url}} into {{workdir}}',
+      gitProject: 'Git Project:{{projectName}}',
     },
     starterTemplates: {
       orStartWith: 'or start a blank app with your favorite stack',
@@ -307,6 +310,12 @@ const en = {
       codeFilesSelected: 'Code Files Selected',
       generatingResponse: 'Generating Response',
       responseGenerated: 'Response Generated',
+    },
+    folderImport: {
+      importFolder: 'Import the "{{folderName}}" folder',
+      fixAndStart: 'Setup the codebase and Start the application',
+      importedFiles: 'I\'ve imported the contents of the "{{folderName}}" folder.',
+      skippedBinaryFiles: 'Skipped {{count}} binary files:',
     },
   },
 } as const;
