@@ -4,6 +4,7 @@ import { Card, CardContent } from '~/components/ui/Card';
 import { Link, Server, Monitor, Globe } from 'lucide-react';
 import { classNames } from '~/utils/classNames';
 import type { IProviderConfig } from '~/types/model';
+import { useTranslation } from 'react-i18next';
 import { PROVIDER_DESCRIPTIONS } from './types';
 
 // Provider Card Component
@@ -24,6 +25,7 @@ function ProviderCard({
   onStartEditing,
   onStopEditing,
 }: ProviderCardProps) {
+  const { t } = useTranslation('settings');
   const getIcon = (providerName: string) => {
     switch (providerName) {
       case 'Ollama':
@@ -41,7 +43,7 @@ function ProviderCard({
 
   return (
     <Card className="bg-bolt-elements-background-depth-2 hover:bg-bolt-elements-background-depth-3 transition-all duration-300 shadow-sm hover:shadow-md border border-bolt-elements-borderColor hover:border-purple-500/30">
-      <CardContent className="p-6">
+      <CardContent className="p-6 pt-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4 flex-1">
             <div
@@ -62,20 +64,28 @@ function ProviderCard({
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h3 className="text-lg font-semibold text-bolt-elements-textPrimary">{provider.name}</h3>
-                <span className="px-2 py-1 text-xs rounded-full bg-green-500/10 text-green-500 font-medium">Local</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-green-500/10 text-green-500 font-medium">
+                  {t('local')}
+                </span>
               </div>
               <p className="text-sm text-bolt-elements-textSecondary mb-4">
-                {PROVIDER_DESCRIPTIONS[provider.name as keyof typeof PROVIDER_DESCRIPTIONS]}
+                {provider.name === 'LMStudio'
+                  ? t('lmStudioDescription')
+                  : provider.name === 'OpenAILike'
+                    ? t('openAILikeDescription')
+                    : provider.name === 'Ollama'
+                      ? t('ollamaDescription')
+                      : PROVIDER_DESCRIPTIONS[provider.name as keyof typeof PROVIDER_DESCRIPTIONS] || provider.name}
               </p>
 
               {provider.settings.enabled && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-bolt-elements-textPrimary">API Endpoint</label>
+                  <label className="text-sm font-medium text-bolt-elements-textPrimary">{t('apiEndpoint')}</label>
                   {isEditing ? (
                     <input
                       type="text"
                       defaultValue={provider.settings.baseUrl}
-                      placeholder={`Enter ${provider.name} base URL`}
+                      placeholder={t('enterBaseUrl', { provider: provider.name })}
                       className="w-full px-4 py-3 rounded-lg text-sm bg-bolt-elements-background-depth-4 border border-purple-500/30 text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-200 shadow-sm"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
@@ -98,7 +108,7 @@ function ProviderCard({
                     >
                       <div className="flex items-center gap-3 text-bolt-elements-textSecondary group-hover:text-bolt-elements-textPrimary">
                         <Link className="w-4 h-4 group-hover:text-purple-500 transition-colors" />
-                        <span className="font-mono">{provider.settings.baseUrl || 'Click to set base URL'}</span>
+                        <span className="font-mono">{provider.settings.baseUrl || t('clickToSetBaseUrl')}</span>
                       </div>
                     </button>
                   )}

@@ -5,9 +5,11 @@ import { Cable, Server, ArrowLeft } from 'lucide-react';
 import { useLocalModelHealth } from '~/lib/hooks/useLocalModelHealth';
 import HealthStatusBadge from './HealthStatusBadge';
 import { PROVIDER_ICONS } from './types';
+import { useTranslation } from 'react-i18next';
 
 // Status Dashboard Component
 function StatusDashboard({ onBack }: { onBack: () => void }) {
+  const { t } = useTranslation('settings');
   const { healthStatuses } = useLocalModelHealth();
 
   return (
@@ -19,24 +21,22 @@ function StatusDashboard({ onBack }: { onBack: () => void }) {
           size="sm"
           onClick={onBack}
           className="bg-transparent hover:bg-transparent text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary transition-all duration-200 p-2"
-          aria-label="Back to Dashboard"
+          aria-label={t('backToDashboard')}
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <div>
-          <h2 className="text-xl font-semibold text-bolt-elements-textPrimary">Provider Status</h2>
-          <p className="text-sm text-bolt-elements-textSecondary">Monitor the health of your local AI providers</p>
+          <h2 className="text-xl font-semibold text-bolt-elements-textPrimary">{t('providerStatus')}</h2>
+          <p className="text-sm text-bolt-elements-textSecondary">{t('monitorHealthDesc')}</p>
         </div>
       </div>
 
       {healthStatuses.length === 0 ? (
         <Card className="bg-bolt-elements-background-depth-2">
-          <CardContent className="p-8 text-center">
+          <CardContent className="p-8 !pt-8 text-center">
             <Cable className="w-16 h-16 mx-auto text-bolt-elements-textTertiary mb-4" />
-            <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">No Endpoints Configured</h3>
-            <p className="text-sm text-bolt-elements-textSecondary">
-              Configure and enable local providers to see their endpoint status here.
-            </p>
+            <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">{t('noEndpointsConfigured')}</h3>
+            <p className="text-sm text-bolt-elements-textSecondary">{t('configureLocalProvidersDesc')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -61,21 +61,21 @@ function StatusDashboard({ onBack }: { onBack: () => void }) {
 
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div className="text-center">
-                    <div className="text-bolt-elements-textSecondary">Models</div>
+                    <div className="text-bolt-elements-textSecondary">{t('models')}</div>
                     <div className="text-lg font-semibold text-bolt-elements-textPrimary">
                       {status.availableModels?.length || 0}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-bolt-elements-textSecondary">Version</div>
+                    <div className="text-bolt-elements-textSecondary">{t('version')}</div>
                     <div className="text-lg font-semibold text-bolt-elements-textPrimary">
-                      {status.version || 'Unknown'}
+                      {status.version || t('unknown')}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-bolt-elements-textSecondary">Last Check</div>
+                    <div className="text-bolt-elements-textSecondary">{t('lastCheck')}</div>
                     <div className="text-lg font-semibold text-bolt-elements-textPrimary">
-                      {status.lastChecked ? new Date(status.lastChecked).toLocaleTimeString() : 'Never'}
+                      {status.lastChecked ? new Date(status.lastChecked).toLocaleTimeString() : t('never')}
                     </div>
                   </div>
                 </div>

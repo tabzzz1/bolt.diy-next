@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '~/components/ui/Button';
 import { Card, CardContent, CardHeader } from '~/components/ui/Card';
 import {
@@ -24,6 +25,8 @@ import {
 
 // Setup Guide Component
 function SetupGuide({ onBack }: { onBack: () => void }) {
+  const { t } = useTranslation('settings');
+
   return (
     <div className="space-y-6">
       {/* Header with Back Button */}
@@ -33,51 +36,59 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           size="sm"
           onClick={onBack}
           className="bg-transparent hover:bg-transparent text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary transition-all duration-200 p-2"
-          aria-label="Back to Dashboard"
+          aria-label={t('localProvidersGuide.backToDashboard')}
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <div>
-          <h2 className="text-xl font-semibold text-bolt-elements-textPrimary">Local Provider Setup Guide</h2>
-          <p className="text-sm text-bolt-elements-textSecondary">
-            Complete setup instructions for running AI models locally
-          </p>
+          <h2 className="text-xl font-semibold text-bolt-elements-textPrimary">{t('localProvidersGuide.title')}</h2>
+          <p className="text-sm text-bolt-elements-textSecondary">{t('localProvidersGuide.subtitle')}</p>
         </div>
       </div>
 
       {/* Hardware Requirements Overview */}
       <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 shadow-sm">
-        <CardContent className="p-6">
+        <CardContent className="p-6 !pt-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
               <Shield className="w-5 h-5 text-blue-500" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-bolt-elements-textPrimary">System Requirements</h3>
-              <p className="text-sm text-bolt-elements-textSecondary">Recommended hardware for optimal performance</p>
+              <h3 className="text-lg font-semibold text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.systemRequirements.title')}
+              </h3>
+              <p className="text-sm text-bolt-elements-textSecondary">
+                {t('localProvidersGuide.systemRequirements.subtitle')}
+              </p>
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-4 text-sm">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Cpu className="w-4 h-4 text-green-500" />
-                <span className="font-medium text-bolt-elements-textPrimary">CPU</span>
+                <span className="font-medium text-bolt-elements-textPrimary">
+                  {t('localProvidersGuide.systemRequirements.cpu')}
+                </span>
               </div>
-              <p className="text-bolt-elements-textSecondary">8+ cores, modern architecture</p>
+              <p className="text-bolt-elements-textSecondary">{t('localProvidersGuide.systemRequirements.cpuDesc')}</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-blue-500" />
-                <span className="font-medium text-bolt-elements-textPrimary">RAM</span>
+                <span className="font-medium text-bolt-elements-textPrimary">
+                  {t('localProvidersGuide.systemRequirements.ram')}
+                </span>
               </div>
-              <p className="text-bolt-elements-textSecondary">16GB minimum, 32GB+ recommended</p>
+              <p className="text-bolt-elements-textSecondary">{t('localProvidersGuide.systemRequirements.ramDesc')}</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Monitor className="w-4 h-4 text-purple-500" />
-                <span className="font-medium text-bolt-elements-textPrimary">GPU</span>
+                <span className="font-medium text-bolt-elements-textPrimary">
+                  {t('localProvidersGuide.systemRequirements.gpu')}
+                </span>
               </div>
-              <p className="text-bolt-elements-textSecondary">NVIDIA RTX 30xx+ or AMD RX 6000+</p>
+              <p className="text-bolt-elements-textSecondary">{t('localProvidersGuide.systemRequirements.gpuDesc')}</p>
             </div>
           </div>
         </CardContent>
@@ -91,13 +102,13 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
               <Server className="w-6 h-6 text-purple-500" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">Ollama Setup</h3>
-              <p className="text-sm text-bolt-elements-textSecondary">
-                Most popular choice for running open-source models locally with desktop app
-              </p>
+              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.ollama.title')}
+              </h3>
+              <p className="text-sm text-bolt-elements-textSecondary">{t('localProvidersGuide.ollama.subtitle')}</p>
             </div>
             <span className="px-3 py-1 bg-purple-500/10 text-purple-500 text-xs font-medium rounded-full">
-              Recommended
+              {t('localProvidersGuide.ollama.recommended')}
             </span>
           </div>
         </CardHeader>
@@ -106,17 +117,17 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="space-y-4">
             <h4 className="font-medium text-bolt-elements-textPrimary flex items-center gap-2">
               <Download className="w-4 h-4" />
-              1. Choose Installation Method
+              {t('localProvidersGuide.ollama.step1')}
             </h4>
 
             {/* Desktop App - New and Recommended */}
             <div className="p-4 rounded-lg bg-green-500/5 border border-green-500/20">
               <div className="flex items-center gap-2 mb-3">
                 <Monitor className="w-5 h-5 text-green-500" />
-                <h5 className="font-medium text-green-500">🆕 Desktop App (Recommended)</h5>
+                <h5 className="font-medium text-green-500">{t('localProvidersGuide.ollama.desktopApp')}</h5>
               </div>
               <p className="text-sm text-bolt-elements-textSecondary mb-3">
-                New user-friendly desktop application with built-in model management and web interface.
+                {t('localProvidersGuide.ollama.desktopAppDesc')}
               </p>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="p-3 rounded-lg bg-bolt-elements-background-depth-3">
@@ -137,7 +148,9 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
                       className="flex items-center justify-center gap-2"
                     >
                       <Download className="w-4 h-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 flex-shrink-0" />
-                      <span className="flex-1 text-center font-medium">Download Desktop App</span>
+                      <span className="flex-1 text-center font-medium">
+                        {t('localProvidersGuide.ollama.downloadDesktop')}
+                      </span>
                       <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 flex-shrink-0" />
                     </a>
                   </Button>
@@ -160,7 +173,9 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
                       className="flex items-center justify-center gap-2"
                     >
                       <Download className="w-4 h-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 flex-shrink-0" />
-                      <span className="flex-1 text-center font-medium">Download Desktop App</span>
+                      <span className="flex-1 text-center font-medium">
+                        {t('localProvidersGuide.ollama.downloadDesktop')}
+                      </span>
                       <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 flex-shrink-0" />
                     </a>
                   </Button>
@@ -169,11 +184,12 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
               <div className="mt-3 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
                 <div className="flex items-center gap-2 mb-1">
                   <Globe className="w-4 h-4 text-blue-500" />
-                  <span className="font-medium text-blue-500 text-sm">Built-in Web Interface</span>
+                  <span className="font-medium text-blue-500 text-sm">
+                    {t('localProvidersGuide.ollama.webInterface')}
+                  </span>
                 </div>
                 <p className="text-xs text-bolt-elements-textSecondary">
-                  Desktop app includes a web interface at{' '}
-                  <code className="bg-bolt-elements-background-depth-4 px-1 rounded">http://localhost:11434</code>
+                  {t('localProvidersGuide.ollama.webInterfaceDesc', { url: 'http://localhost:11434' })}
                 </p>
               </div>
             </div>
@@ -182,7 +198,7 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
             <div className="p-4 rounded-lg bg-bolt-elements-background-depth-3">
               <div className="flex items-center gap-2 mb-3">
                 <Terminal className="w-5 h-5 text-bolt-elements-textPrimary" />
-                <h5 className="font-medium text-bolt-elements-textPrimary">Command Line (Advanced)</h5>
+                <h5 className="font-medium text-bolt-elements-textPrimary">{t('localProvidersGuide.ollama.cli')}</h5>
               </div>
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="p-3 rounded-lg bg-bolt-elements-background-depth-4">
@@ -220,16 +236,16 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="space-y-4">
             <h4 className="font-medium text-bolt-elements-textPrimary flex items-center gap-2">
               <Package className="w-4 h-4" />
-              2. Download Latest Models
+              {t('localProvidersGuide.models.title')}
             </h4>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-bolt-elements-background-depth-3">
                 <h5 className="font-medium text-bolt-elements-textPrimary mb-3 flex items-center gap-2">
                   <Code className="w-4 h-4 text-green-500" />
-                  Code & Development
+                  {t('localProvidersGuide.models.codeTitle')}
                 </h5>
                 <div className="space-y-2 text-xs bg-bolt-elements-background-depth-4 p-3 rounded font-mono text-bolt-elements-textPrimary">
-                  <div># Latest Llama 3.2 for coding</div>
+                  <div>{t('localProvidersGuide.models.codeDesc')}</div>
                   <div>ollama pull llama3.2:3b</div>
                   <div>ollama pull codellama:13b</div>
                   <div>ollama pull deepseek-coder-v2</div>
@@ -239,10 +255,10 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
               <div className="p-4 rounded-lg bg-bolt-elements-background-depth-3">
                 <h5 className="font-medium text-bolt-elements-textPrimary mb-3 flex items-center gap-2">
                   <Terminal className="w-4 h-4 text-blue-500" />
-                  General Purpose & Chat
+                  {t('localProvidersGuide.models.chatTitle')}
                 </h5>
                 <div className="space-y-2 text-xs bg-bolt-elements-background-depth-4 p-3 rounded font-mono text-bolt-elements-textPrimary">
-                  <div># Latest general models</div>
+                  <div>{t('localProvidersGuide.models.chatDesc')}</div>
                   <div>ollama pull llama3.2:3b</div>
                   <div>ollama pull mistral:7b</div>
                   <div>ollama pull phi3.5:3.8b</div>
@@ -254,25 +270,27 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
               <div className="p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">
                 <div className="flex items-center gap-2 mb-2">
                   <Activity className="w-4 h-4 text-purple-500" />
-                  <span className="font-medium text-purple-500">Performance Optimized</span>
+                  <span className="font-medium text-purple-500">
+                    {t('localProvidersGuide.models.performanceOptimized')}
+                  </span>
                 </div>
                 <ul className="text-xs text-bolt-elements-textSecondary space-y-1">
-                  <li>• Llama 3.2: 3B - Fastest, 8GB RAM</li>
-                  <li>• Phi-3.5: 3.8B - Great balance</li>
-                  <li>• Qwen2.5: 7B - Excellent quality</li>
-                  <li>• Mistral: 7B - Popular choice</li>
+                  <li>• {t('localProvidersGuide.models.performanceList.llama')}</li>
+                  <li>• {t('localProvidersGuide.models.performanceList.phi')}</li>
+                  <li>• {t('localProvidersGuide.models.performanceList.qwen')}</li>
+                  <li>• {t('localProvidersGuide.models.performanceList.mistral')}</li>
                 </ul>
               </div>
               <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertCircle className="w-4 h-4 text-yellow-500" />
-                  <span className="font-medium text-yellow-500">Pro Tips</span>
+                  <span className="font-medium text-yellow-500">{t('localProvidersGuide.models.proTips')}</span>
                 </div>
                 <ul className="text-xs text-bolt-elements-textSecondary space-y-1">
-                  <li>• Start with 3B-7B models for best performance</li>
-                  <li>• Use quantized versions for faster loading</li>
-                  <li>• Desktop app auto-manages model storage</li>
-                  <li>• Web UI available at localhost:11434</li>
+                  <li>• {t('localProvidersGuide.models.tips.performance')}</li>
+                  <li>• {t('localProvidersGuide.models.tips.quantized')}</li>
+                  <li>• {t('localProvidersGuide.models.tips.storage')}</li>
+                  <li>• {t('localProvidersGuide.models.tips.webUi')}</li>
                 </ul>
               </div>
             </div>
@@ -282,26 +300,26 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="space-y-4">
             <h4 className="font-medium text-bolt-elements-textPrimary flex items-center gap-2">
               <Monitor className="w-4 h-4" />
-              3. Desktop App Features
+              {t('localProvidersGuide.features.title')}
             </h4>
             <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h5 className="font-medium text-blue-500 mb-3">🖥️ User Interface</h5>
+                  <h5 className="font-medium text-blue-500 mb-3">{t('localProvidersGuide.features.uiTitle')}</h5>
                   <ul className="text-sm text-bolt-elements-textSecondary space-y-1">
-                    <li>• Model library browser</li>
-                    <li>• One-click model downloads</li>
-                    <li>• Built-in chat interface</li>
-                    <li>• System resource monitoring</li>
+                    <li>• {t('localProvidersGuide.features.uiList.library')}</li>
+                    <li>• {t('localProvidersGuide.features.uiList.download')}</li>
+                    <li>• {t('localProvidersGuide.features.uiList.chat')}</li>
+                    <li>• {t('localProvidersGuide.features.uiList.monitoring')}</li>
                   </ul>
                 </div>
                 <div>
-                  <h5 className="font-medium text-blue-500 mb-3">🔧 Management Tools</h5>
+                  <h5 className="font-medium text-blue-500 mb-3">{t('localProvidersGuide.features.mgmtTitle')}</h5>
                   <ul className="text-sm text-bolt-elements-textSecondary space-y-1">
-                    <li>• Automatic updates</li>
-                    <li>• Model size optimization</li>
-                    <li>• GPU acceleration detection</li>
-                    <li>• Cross-platform compatibility</li>
+                    <li>• {t('localProvidersGuide.features.mgmtList.updates')}</li>
+                    <li>• {t('localProvidersGuide.features.mgmtList.optimization')}</li>
+                    <li>• {t('localProvidersGuide.features.mgmtList.gpu')}</li>
+                    <li>• {t('localProvidersGuide.features.mgmtList.crossPlatform')}</li>
                   </ul>
                 </div>
               </div>
@@ -312,32 +330,36 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="space-y-4">
             <h4 className="font-medium text-bolt-elements-textPrimary flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              4. Troubleshooting & Commands
+              {t('localProvidersGuide.troubleshooting.title')}
             </h4>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
-                <h5 className="font-medium text-red-500 mb-2">Common Issues</h5>
+                <h5 className="font-medium text-red-500 mb-2">
+                  {t('localProvidersGuide.troubleshooting.commonIssues')}
+                </h5>
                 <ul className="text-xs text-bolt-elements-textSecondary space-y-1">
-                  <li>• Desktop app not starting: Restart system</li>
-                  <li>• GPU not detected: Update drivers</li>
-                  <li>• Port 11434 blocked: Change port in settings</li>
-                  <li>• Models not loading: Check available disk space</li>
-                  <li>• Slow performance: Use smaller models or enable GPU</li>
+                  <li>• {t('localProvidersGuide.troubleshooting.issues.appNotStarting')}</li>
+                  <li>• {t('localProvidersGuide.troubleshooting.issues.gpuNotDetected')}</li>
+                  <li>• {t('localProvidersGuide.troubleshooting.issues.portBlocked')}</li>
+                  <li>• {t('localProvidersGuide.troubleshooting.issues.modelsNotLoading')}</li>
+                  <li>• {t('localProvidersGuide.troubleshooting.issues.slowPerformance')}</li>
                 </ul>
               </div>
               <div className="p-4 rounded-lg bg-green-500/5 border border-green-500/20">
-                <h5 className="font-medium text-green-500 mb-2">Useful Commands</h5>
+                <h5 className="font-medium text-green-500 mb-2">
+                  {t('localProvidersGuide.troubleshooting.usefulCommands')}
+                </h5>
                 <div className="text-xs bg-bolt-elements-background-depth-4 p-3 rounded font-mono text-bolt-elements-textPrimary space-y-1">
-                  <div># Check installed models</div>
+                  <div>{t('localProvidersGuide.troubleshooting.commands.checkModels')}</div>
                   <div>ollama list</div>
                   <div></div>
-                  <div># Remove unused models</div>
+                  <div>{t('localProvidersGuide.troubleshooting.commands.removeModels')}</div>
                   <div>ollama rm model_name</div>
                   <div></div>
-                  <div># Check GPU usage</div>
+                  <div>{t('localProvidersGuide.troubleshooting.commands.checkGpu')}</div>
                   <div>ollama ps</div>
                   <div></div>
-                  <div># View logs</div>
+                  <div>{t('localProvidersGuide.troubleshooting.commands.viewLogs')}</div>
                   <div>ollama logs</div>
                 </div>
               </div>
@@ -354,10 +376,10 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
               <Monitor className="w-6 h-6 text-blue-500" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">LM Studio Setup</h3>
-              <p className="text-sm text-bolt-elements-textSecondary">
-                User-friendly GUI for running local models with excellent model management
-              </p>
+              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.lmStudio.title')}
+              </h3>
+              <p className="text-sm text-bolt-elements-textSecondary">{t('localProvidersGuide.lmStudio.subtitle')}</p>
             </div>
           </div>
         </CardHeader>
@@ -366,11 +388,11 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="space-y-4">
             <h4 className="font-medium text-bolt-elements-textPrimary flex items-center gap-2">
               <Download className="w-4 h-4" />
-              1. Download & Install
+              {t('localProvidersGuide.lmStudio.step1')}
             </h4>
             <div className="p-4 rounded-lg bg-bolt-elements-background-depth-3">
               <p className="text-sm text-bolt-elements-textSecondary mb-3">
-                Download LM Studio for Windows, macOS, or Linux from the official website.
+                {t('localProvidersGuide.lmStudio.downloadDesc')}
               </p>
               <Button
                 variant="outline"
@@ -385,7 +407,9 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
                   className="flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 flex-shrink-0" />
-                  <span className="flex-1 text-center font-medium">Download LM Studio</span>
+                  <span className="flex-1 text-center font-medium">
+                    {t('localProvidersGuide.lmStudio.downloadButton')}
+                  </span>
                   <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 flex-shrink-0" />
                 </a>
               </Button>
@@ -396,34 +420,36 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="space-y-4">
             <h4 className="font-medium text-bolt-elements-textPrimary flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              2. Configure Local Server
+              {t('localProvidersGuide.lmStudio.step2')}
             </h4>
             <div className="space-y-3">
               <div className="p-4 rounded-lg bg-bolt-elements-background-depth-3">
-                <h5 className="font-medium text-bolt-elements-textPrimary mb-2">Start Local Server</h5>
+                <h5 className="font-medium text-bolt-elements-textPrimary mb-2">
+                  {t('localProvidersGuide.lmStudio.startServer')}
+                </h5>
                 <ol className="text-xs text-bolt-elements-textSecondary space-y-1 list-decimal list-inside">
-                  <li>Download a model from the "My Models" tab</li>
-                  <li>Go to "Local Server" tab</li>
-                  <li>Select your downloaded model</li>
-                  <li>Set port to 1234 (default)</li>
-                  <li>Click "Start Server"</li>
+                  <li>{t('localProvidersGuide.lmStudio.steps.download')}</li>
+                  <li>{t('localProvidersGuide.lmStudio.steps.tab')}</li>
+                  <li>{t('localProvidersGuide.lmStudio.steps.select')}</li>
+                  <li>{t('localProvidersGuide.lmStudio.steps.port')}</li>
+                  <li>{t('localProvidersGuide.lmStudio.steps.start')}</li>
                 </ol>
               </div>
 
               <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertCircle className="w-4 h-4 text-red-500" />
-                  <span className="font-medium text-red-500">Critical: Enable CORS</span>
+                  <span className="font-medium text-red-500">{t('localProvidersGuide.lmStudio.cors.title')}</span>
                 </div>
                 <div className="space-y-2">
                   <p className="text-xs text-bolt-elements-textSecondary">
-                    To work with Bolt DIY, you MUST enable CORS in LM Studio:
+                    {t('localProvidersGuide.lmStudio.cors.desc')}
                   </p>
                   <ol className="text-xs text-bolt-elements-textSecondary space-y-1 list-decimal list-inside ml-2">
-                    <li>In Server Settings, check "Enable CORS"</li>
-                    <li>Set Network Interface to "0.0.0.0" for external access</li>
+                    <li>{t('localProvidersGuide.lmStudio.cors.enable')}</li>
+                    <li>{t('localProvidersGuide.lmStudio.cors.network')}</li>
                     <li>
-                      Alternatively, use CLI:{' '}
+                      {t('localProvidersGuide.lmStudio.cors.cli')}{' '}
                       <code className="bg-bolt-elements-background-depth-4 px-1 rounded">lms server start --cors</code>
                     </li>
                   </ol>
@@ -436,14 +462,14 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle className="w-4 h-4 text-blue-500" />
-              <span className="font-medium text-blue-500">LM Studio Advantages</span>
+              <span className="font-medium text-blue-500">{t('localProvidersGuide.lmStudio.advantages.title')}</span>
             </div>
             <ul className="text-xs text-bolt-elements-textSecondary space-y-1 list-disc list-inside">
-              <li>Built-in model downloader with search</li>
-              <li>Easy model switching and management</li>
-              <li>Built-in chat interface for testing</li>
-              <li>GGUF format support (most compatible)</li>
-              <li>Regular updates with new features</li>
+              <li>{t('localProvidersGuide.lmStudio.advantages.list.downloader')}</li>
+              <li>{t('localProvidersGuide.lmStudio.advantages.list.management')}</li>
+              <li>{t('localProvidersGuide.lmStudio.advantages.list.chat')}</li>
+              <li>{t('localProvidersGuide.lmStudio.advantages.list.gguf')}</li>
+              <li>{t('localProvidersGuide.lmStudio.advantages.list.updates')}</li>
             </ul>
           </div>
         </CardContent>
@@ -457,10 +483,10 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
               <Globe className="w-6 h-6 text-green-500" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">LocalAI Setup</h3>
-              <p className="text-sm text-bolt-elements-textSecondary">
-                Self-hosted OpenAI-compatible API server with extensive model support
-              </p>
+              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.localAi.title')}
+              </h3>
+              <p className="text-sm text-bolt-elements-textSecondary">{t('localProvidersGuide.localAi.subtitle')}</p>
             </div>
           </div>
         </CardHeader>
@@ -469,18 +495,22 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="space-y-4">
             <h4 className="font-medium text-bolt-elements-textPrimary flex items-center gap-2">
               <Download className="w-4 h-4" />
-              Installation Options
+              {t('localProvidersGuide.localAi.installation')}
             </h4>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-bolt-elements-background-depth-3">
-                <h5 className="font-medium text-bolt-elements-textPrimary mb-2">Quick Install</h5>
+                <h5 className="font-medium text-bolt-elements-textPrimary mb-2">
+                  {t('localProvidersGuide.localAi.quickInstall')}
+                </h5>
                 <div className="text-xs bg-bolt-elements-background-depth-4 p-3 rounded font-mono text-bolt-elements-textPrimary space-y-1">
-                  <div># One-line install</div>
+                  <div>{t('localProvidersGuide.localAi.oneLine')}</div>
                   <div>curl https://localai.io/install.sh | sh</div>
                 </div>
               </div>
               <div className="p-4 rounded-lg bg-bolt-elements-background-depth-3">
-                <h5 className="font-medium text-bolt-elements-textPrimary mb-2">Docker (Recommended)</h5>
+                <h5 className="font-medium text-bolt-elements-textPrimary mb-2">
+                  {t('localProvidersGuide.localAi.docker')}
+                </h5>
                 <div className="text-xs bg-bolt-elements-background-depth-4 p-3 rounded font-mono text-bolt-elements-textPrimary space-y-1">
                   <div>docker run -p 8080:8080</div>
                   <div>quay.io/go-skynet/local-ai:latest</div>
@@ -493,14 +523,14 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="space-y-4">
             <h4 className="font-medium text-bolt-elements-textPrimary flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              Configuration
+              {t('localProvidersGuide.localAi.configTitle')}
             </h4>
             <div className="p-4 rounded-lg bg-bolt-elements-background-depth-3">
               <p className="text-sm text-bolt-elements-textSecondary mb-3">
-                LocalAI supports many model formats and provides a full OpenAI-compatible API.
+                {t('localProvidersGuide.localAi.configDesc')}
               </p>
               <div className="text-xs bg-bolt-elements-background-depth-4 p-3 rounded font-mono text-bolt-elements-textPrimary space-y-1">
-                <div># Example configuration</div>
+                <div>{t('localProvidersGuide.localAi.exampleConfig')}</div>
                 <div>models:</div>
                 <div>- name: llama3.1</div>
                 <div>backend: llama</div>
@@ -514,14 +544,14 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
           <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              <span className="font-medium text-green-500">LocalAI Advantages</span>
+              <span className="font-medium text-green-500">{t('localProvidersGuide.localAi.advantages.title')}</span>
             </div>
             <ul className="text-xs text-bolt-elements-textSecondary space-y-1 list-disc list-inside">
-              <li>Full OpenAI API compatibility</li>
-              <li>Supports multiple model formats</li>
-              <li>Docker deployment option</li>
-              <li>Built-in model gallery</li>
-              <li>REST API for model management</li>
+              <li>{t('localProvidersGuide.localAi.advantages.list.compatibility')}</li>
+              <li>{t('localProvidersGuide.localAi.advantages.list.formats')}</li>
+              <li>{t('localProvidersGuide.localAi.advantages.list.docker')}</li>
+              <li>{t('localProvidersGuide.localAi.advantages.list.gallery')}</li>
+              <li>{t('localProvidersGuide.localAi.advantages.list.mgmt')}</li>
             </ul>
           </div>
         </CardContent>
@@ -535,52 +565,60 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
               <Activity className="w-5 h-5 text-purple-500" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-bolt-elements-textPrimary">Performance Optimization</h3>
-              <p className="text-sm text-bolt-elements-textSecondary">Tips to improve local AI performance</p>
+              <h3 className="text-lg font-semibold text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.optimization.title')}
+              </h3>
+              <p className="text-sm text-bolt-elements-textSecondary">
+                {t('localProvidersGuide.optimization.subtitle')}
+              </p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
-              <h4 className="font-medium text-bolt-elements-textPrimary">Hardware Optimizations</h4>
+              <h4 className="font-medium text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.optimization.hardware')}
+              </h4>
               <ul className="text-sm text-bolt-elements-textSecondary space-y-2">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Use NVIDIA GPU with CUDA for 5-10x speedup</span>
+                  <span>{t('localProvidersGuide.optimization.hardwareList.cuda')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Increase RAM for larger context windows</span>
+                  <span>{t('localProvidersGuide.optimization.hardwareList.ram')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Use SSD storage for faster model loading</span>
+                  <span>{t('localProvidersGuide.optimization.hardwareList.ssd')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Close other applications to free up RAM</span>
+                  <span>{t('localProvidersGuide.optimization.hardwareList.apps')}</span>
                 </li>
               </ul>
             </div>
             <div className="space-y-3">
-              <h4 className="font-medium text-bolt-elements-textPrimary">Software Optimizations</h4>
+              <h4 className="font-medium text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.optimization.software')}
+              </h4>
               <ul className="text-sm text-bolt-elements-textSecondary space-y-2">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span>Use smaller models for faster responses</span>
+                  <span>{t('localProvidersGuide.optimization.softwareList.smallModels')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span>Enable quantization (4-bit, 8-bit models)</span>
+                  <span>{t('localProvidersGuide.optimization.softwareList.quantization')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span>Reduce context length for chat applications</span>
+                  <span>{t('localProvidersGuide.optimization.softwareList.context')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span>Use streaming responses for better UX</span>
+                  <span>{t('localProvidersGuide.optimization.softwareList.streaming')}</span>
                 </li>
               </ul>
             </div>
@@ -596,9 +634,11 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
               <Wifi className="w-6 h-6 text-orange-500" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">Alternative Options</h3>
+              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.alternatives.title')}
+              </h3>
               <p className="text-sm text-bolt-elements-textSecondary">
-                Other local AI solutions and cloud alternatives
+                {t('localProvidersGuide.alternatives.subtitle')}
               </p>
             </div>
           </div>
@@ -606,7 +646,9 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
         <CardContent className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <h4 className="font-medium text-bolt-elements-textPrimary">Other Local Solutions</h4>
+              <h4 className="font-medium text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.alternatives.localTitle')}
+              </h4>
               <div className="space-y-3">
                 <div className="p-3 rounded-lg bg-bolt-elements-background-depth-3">
                   <div className="flex items-center gap-2 mb-1">
@@ -614,7 +656,7 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
                     <span className="font-medium text-bolt-elements-textPrimary">Jan.ai</span>
                   </div>
                   <p className="text-xs text-bolt-elements-textSecondary">
-                    Modern interface with built-in model marketplace
+                    {t('localProvidersGuide.alternatives.localList.jan')}
                   </p>
                 </div>
                 <div className="p-3 rounded-lg bg-bolt-elements-background-depth-3">
@@ -623,7 +665,7 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
                     <span className="font-medium text-bolt-elements-textPrimary">Oobabooga</span>
                   </div>
                   <p className="text-xs text-bolt-elements-textSecondary">
-                    Advanced text generation web UI with extensions
+                    {t('localProvidersGuide.alternatives.localList.oobabooga')}
                   </p>
                 </div>
                 <div className="p-3 rounded-lg bg-bolt-elements-background-depth-3">
@@ -631,33 +673,43 @@ function SetupGuide({ onBack }: { onBack: () => void }) {
                     <Cable className="w-4 h-4 text-purple-500" />
                     <span className="font-medium text-bolt-elements-textPrimary">KoboldAI</span>
                   </div>
-                  <p className="text-xs text-bolt-elements-textSecondary">Focus on creative writing and storytelling</p>
+                  <p className="text-xs text-bolt-elements-textSecondary">
+                    {t('localProvidersGuide.alternatives.localList.kobold')}
+                  </p>
                 </div>
               </div>
             </div>
             <div className="space-y-4">
-              <h4 className="font-medium text-bolt-elements-textPrimary">Cloud Alternatives</h4>
+              <h4 className="font-medium text-bolt-elements-textPrimary">
+                {t('localProvidersGuide.alternatives.cloudTitle')}
+              </h4>
               <div className="space-y-3">
                 <div className="p-3 rounded-lg bg-bolt-elements-background-depth-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Globe className="w-4 h-4 text-orange-500" />
                     <span className="font-medium text-bolt-elements-textPrimary">OpenRouter</span>
                   </div>
-                  <p className="text-xs text-bolt-elements-textSecondary">Access to 100+ models through unified API</p>
+                  <p className="text-xs text-bolt-elements-textSecondary">
+                    {t('localProvidersGuide.alternatives.cloudList.openrouter')}
+                  </p>
                 </div>
                 <div className="p-3 rounded-lg bg-bolt-elements-background-depth-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Server className="w-4 h-4 text-red-500" />
                     <span className="font-medium text-bolt-elements-textPrimary">Together AI</span>
                   </div>
-                  <p className="text-xs text-bolt-elements-textSecondary">Fast inference with open-source models</p>
+                  <p className="text-xs text-bolt-elements-textSecondary">
+                    {t('localProvidersGuide.alternatives.cloudList.together')}
+                  </p>
                 </div>
                 <div className="p-3 rounded-lg bg-bolt-elements-background-depth-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Activity className="w-4 h-4 text-pink-500" />
                     <span className="font-medium text-bolt-elements-textPrimary">Groq</span>
                   </div>
-                  <p className="text-xs text-bolt-elements-textSecondary">Ultra-fast LPU inference for Llama models</p>
+                  <p className="text-xs text-bolt-elements-textSecondary">
+                    {t('localProvidersGuide.alternatives.cloudList.groq')}
+                  </p>
                 </div>
               </div>
             </div>

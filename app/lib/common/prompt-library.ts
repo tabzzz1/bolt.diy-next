@@ -18,6 +18,12 @@ export interface PromptOptions {
   };
 }
 
+export interface LocalizedPrompt {
+  id: string;
+  label: string;
+  description: string;
+}
+
 export class PromptLibrary {
   static library: Record<
     string,
@@ -43,6 +49,7 @@ export class PromptLibrary {
       get: (options) => optimized(options),
     },
   };
+
   static getList() {
     return Object.entries(this.library).map(([key, value]) => {
       const { label, description } = value;
@@ -53,6 +60,25 @@ export class PromptLibrary {
       };
     });
   }
+
+  static getLocalizedList(t: (key: string) => string): LocalizedPrompt[] {
+    return Object.entries(this.library).map(([key]) => {
+      const keys: Record<string, { labelKey: string; descKey: string }> = {
+        default: { labelKey: 'defaultPrompt', descKey: 'defaultPromptDesc' },
+        original: { labelKey: 'oldDefaultPrompt', descKey: 'oldDefaultPromptDesc' },
+        optimized: { labelKey: 'optimizedPrompt', descKey: 'optimizedPromptDesc' },
+      };
+
+      const { labelKey, descKey } = keys[key] || { labelKey: '', descKey: '' };
+
+      return {
+        id: key,
+        label: labelKey ? t(labelKey as any) : this.library[key].label,
+        description: descKey ? t(descKey as any) : this.library[key].description,
+      };
+    });
+  }
+
   static getPropmtFromLibrary(promptId: string, options: PromptOptions) {
     const prompt = this.library[promptId];
 

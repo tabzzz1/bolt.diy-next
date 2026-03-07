@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { classNames } from '~/utils/classNames';
 import { toast } from 'react-toastify';
 import { providerBaseUrlEnvKeys } from '~/utils/constants';
+import { useTranslation } from 'react-i18next';
 import { SiAmazon, SiGoogle, SiGithub, SiHuggingface, SiPerplexity, SiOpenai } from 'react-icons/si';
 import { BsRobot, BsCloud } from 'react-icons/bs';
 import { TbBrain, TbCloudComputing } from 'react-icons/tb';
@@ -60,6 +61,7 @@ const PROVIDER_DESCRIPTIONS: Partial<Record<ProviderName, string>> = {
 };
 
 const CloudProvidersTab = () => {
+  const { t } = useTranslation('settings');
   const settings = useSettings();
   const [editingProvider, setEditingProvider] = useState<string | null>(null);
   const [filteredProviders, setFilteredProviders] = useState<IProviderConfig[]>([]);
@@ -95,7 +97,7 @@ const CloudProvidersTab = () => {
       });
 
       setCategoryEnabled(enabled);
-      toast.success(enabled ? 'All cloud providers enabled' : 'All cloud providers disabled');
+      toast.success(enabled ? t('allCloudProvidersEnabled') : t('allCloudProvidersDisabled'));
     },
     [filteredProviders, settings],
   );
@@ -107,10 +109,10 @@ const CloudProvidersTab = () => {
 
       if (enabled) {
         logStore.logProvider(`Provider ${provider.name} enabled`, { provider: provider.name });
-        toast.success(`${provider.name} enabled`);
+        toast.success(t('providerEnabled', { provider: provider.name }));
       } else {
         logStore.logProvider(`Provider ${provider.name} disabled`, { provider: provider.name });
-        toast.success(`${provider.name} disabled`);
+        toast.success(t('providerDisabled', { provider: provider.name }));
       }
     },
     [settings],
@@ -127,21 +129,21 @@ const CloudProvidersTab = () => {
         provider: provider.name,
         baseUrl: newBaseUrl,
       });
-      toast.success(`${provider.name} base URL updated`);
+      toast.success(t('baseUrlUpdated', { provider: provider.name }));
       setEditingProvider(null);
     },
     [settings],
   );
 
   return (
-    <div className="space-y-6">
+    <div>
       <motion.div
-        className="space-y-4"
+        className=""
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex items-center justify-between gap-4 mt-8 mb-4">
+        <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2">
             <div
               className={classNames(
@@ -153,18 +155,18 @@ const CloudProvidersTab = () => {
               <TbCloudComputing className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-md font-medium text-bolt-elements-textPrimary">Cloud Providers</h4>
-              <p className="text-sm text-bolt-elements-textSecondary">Connect to cloud-based AI models and services</p>
+              <h4 className="text-md font-medium text-bolt-elements-textPrimary">{t('cloudProviders')}</h4>
+              <p className="text-sm text-bolt-elements-textSecondary">{t('cloudProvidersSubtitle')}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-bolt-elements-textSecondary">Enable All Cloud</span>
+            <span className="text-sm text-bolt-elements-textSecondary">{t('enableAllCloud')}</span>
             <Switch checked={categoryEnabled} onCheckedChange={handleToggleCategory} />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
           {filteredProviders.map((provider, index) => (
             <motion.div
               key={provider.name}
@@ -188,7 +190,7 @@ const CloudProvidersTab = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    Configurable
+                    {t('configurable')}
                   </motion.span>
                 )}
               </div>
@@ -221,8 +223,8 @@ const CloudProvidersTab = () => {
                       <p className="text-xs text-bolt-elements-textSecondary mt-0.5">
                         {PROVIDER_DESCRIPTIONS[provider.name as keyof typeof PROVIDER_DESCRIPTIONS] ||
                           (URL_CONFIGURABLE_PROVIDERS.includes(provider.name)
-                            ? 'Configure custom endpoint for this provider'
-                            : 'Standard AI provider integration')}
+                            ? t('configureCustomEndpoint')
+                            : t('standardProviderIntegration'))}
                       </p>
                     </div>
                     <Switch
@@ -243,7 +245,7 @@ const CloudProvidersTab = () => {
                           <input
                             type="text"
                             defaultValue={provider.settings.baseUrl}
-                            placeholder={`Enter ${provider.name} base URL`}
+                            placeholder={t('enterBaseUrl', { provider: provider.name })}
                             className={classNames(
                               'flex-1 px-3 py-1.5 rounded-lg text-sm',
                               'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
@@ -269,7 +271,7 @@ const CloudProvidersTab = () => {
                             <div className="flex items-center gap-2 text-bolt-elements-textSecondary">
                               <div className="i-ph:link text-sm" />
                               <span className="group-hover/url:text-purple-500 transition-colors">
-                                {provider.settings.baseUrl || 'Click to set base URL'}
+                                {provider.settings.baseUrl || t('clickToSetBaseUrl')}
                               </span>
                             </div>
                           </div>
@@ -280,7 +282,7 @@ const CloudProvidersTab = () => {
                         <div className="mt-2 text-xs text-green-500">
                           <div className="flex items-center gap-1">
                             <div className="i-ph:info" />
-                            <span>Environment URL set in .env file</span>
+                            <span>{t('envUrlSet')}</span>
                           </div>
                         </div>
                       )}

@@ -1,6 +1,7 @@
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { motion, type Variants } from 'framer-motion';
 import React, { memo, type ReactNode, useState, useEffect } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { classNames } from '~/utils/classNames';
 import { cubicEasingFn } from '~/utils/easings';
 import { IconButton } from './IconButton';
@@ -208,7 +209,7 @@ export function ConfirmationDialog({
   return (
     <RadixDialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog showCloseButton={false}>
-        <div className="p-6 bg-white dark:bg-gray-950 relative z-10">
+        <div className="p-6 bg-white dark:bg-gray-950 relative z-10 rounded-lg">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription className="mb-4">{description}</DialogDescription>
           <div className="flex justify-end space-x-2">
@@ -299,11 +300,14 @@ export function SelectionDialog({
   isOpen,
   onClose,
   onConfirm,
-  confirmLabel = 'Confirm',
+  confirmLabel,
   maxHeight = '60vh',
 }: SelectionDialogProps) {
+  const { t } = useTranslation('settings');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+
+  const finalConfirmLabel = confirmLabel || t('confirm');
 
   // Reset selected items when dialog opens
   useEffect(() => {
@@ -382,17 +386,24 @@ export function SelectionDialog({
   return (
     <RadixDialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog showCloseButton={false}>
-        <div className="p-6 bg-white dark:bg-gray-950 relative z-10">
+        <div className="p-6 bg-white dark:bg-gray-950 relative z-10 rounded-lg">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription className="mt-2 mb-4">
-            Select the items you want to include and click{' '}
-            <span className="text-bolt-elements-item-contentAccent font-medium">{confirmLabel}</span>.
+            <Trans
+              i18nKey="selectionDialogDescription"
+              ns="settings"
+              values={{ label: finalConfirmLabel }}
+              components={[
+                <span key="0" />,
+                <span key="1" className="text-bolt-elements-item-contentAccent font-medium" />,
+              ]}
+            />
           </DialogDescription>
 
           <div className="py-4">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-medium text-bolt-elements-textSecondary">
-                {selectedItems.length} of {items.length} selected
+                {t('itemsSelected', { count: selectedItems.length, total: items.length })}
               </span>
               <Button
                 variant="ghost"
@@ -400,7 +411,7 @@ export function SelectionDialog({
                 onClick={handleSelectAll}
                 className="text-xs h-8 px-2 text-bolt-elements-textPrimary hover:text-bolt-elements-item-contentAccent hover:bg-bolt-elements-item-backgroundAccent bg-bolt-elements-bg-depth-2 dark:bg-transparent"
               >
-                {selectAll ? 'Deselect All' : 'Select All'}
+                {selectAll ? t('deselectAll') : t('selectAll')}
               </Button>
             </div>
 
@@ -421,7 +432,7 @@ export function SelectionDialog({
                   {ItemRenderer}
                 </FixedSizeList>
               ) : (
-                <div className="text-center py-4 text-sm text-bolt-elements-textTertiary">No items to display</div>
+                <div className="text-center py-4 text-sm text-bolt-elements-textTertiary">{t('noItemsToDisplay')}</div>
               )}
             </div>
           </div>
@@ -432,14 +443,14 @@ export function SelectionDialog({
               onClick={onClose}
               className="border-bolt-elements-borderColor text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive"
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleConfirm}
               disabled={selectedItems.length === 0}
               className="bg-accent-500 text-white hover:bg-accent-600 disabled:opacity-50 disabled:pointer-events-none"
             >
-              {confirmLabel}
+              {finalConfirmLabel}
             </Button>
           </div>
         </div>

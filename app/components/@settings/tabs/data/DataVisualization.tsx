@@ -14,6 +14,7 @@ import {
 import { Bar, Pie } from 'react-chartjs-2';
 import type { Chat } from '~/lib/persistence/chats';
 import { classNames } from '~/utils/classNames';
+import { useTranslation } from 'react-i18next';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement);
@@ -23,6 +24,7 @@ type DataVisualizationProps = {
 };
 
 export function DataVisualization({ chats }: DataVisualizationProps) {
+  const { t } = useTranslation('settings');
   const [chatsByDate, setChatsByDate] = useState<Record<string, number>>({});
   const [messagesByRole, setMessagesByRole] = useState<Record<string, number>>({});
   const [apiKeyUsage, setApiKeyUsage] = useState<Array<{ provider: string; count: number }>>([]);
@@ -61,13 +63,35 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
       const date = new Date(chat.timestamp).toLocaleDateString();
       chatDates[date] = (chatDates[date] || 0) + 1;
 
+      // Track the last seen provider from a user message in this chat
+      let lastKnownProvider = 'unknown';
+
       chat.messages.forEach((message) => {
         roleCounts[message.role] = (roleCounts[message.role] || 0) + 1;
         totalMessages++;
 
+        // Try to extract provider from the current message (User or Assistant)
+        const providerMatch =
+          message.content.match(/\[Provider:\s*([^\]]+)\]/i) || message.content.match(/provider:\s*([\w-]+)/i);
+
+        if (providerMatch) {
+          lastKnownProvider = providerMatch[1].trim();
+        }
+
         if (message.role === 'assistant') {
-          const providerMatch = message.content.match(/provider:\s*([\w-]+)/i);
-          const provider = providerMatch ? providerMatch[1] : 'unknown';
+          // Skip system-like messages that are purely technical logs (e.g., git cloning, npm install)
+          const isSystemLog =
+            message.content.includes('正在克隆仓库') ||
+            message.content.includes('Found "dev" script') ||
+            message.content.includes('<boltAction type="shell"');
+
+          if (isSystemLog) {
+            return;
+          }
+
+          // Use the provider from the message, or fall back to the last known provider from the conversation context
+          const provider = providerMatch ? providerMatch[1].trim() : lastKnownProvider;
+
           apiUsage[provider] = (apiUsage[provider] || 0) + 1;
         }
       });
@@ -171,7 +195,7 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
       labels: Object.keys(chatsByDate),
       datasets: [
         {
-          label: 'Chats Created',
+          label: t('chatsCreated'),
           data: Object.values(chatsByDate),
           backgroundColor: getChartColors(0).bg,
           borderColor: getChartColors(0).border,
@@ -183,7 +207,7 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
       labels: Object.keys(messagesByRole),
       datasets: [
         {
-          label: 'Messages by Role',
+          label: t('messagesByRole'),
           data: Object.values(messagesByRole),
           backgroundColor: Object.keys(messagesByRole).map((_, i) => getChartColors(i).bg),
           borderColor: Object.keys(messagesByRole).map((_, i) => getChartColors(i).border),
@@ -195,7 +219,7 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
       labels: apiKeyUsage.map((item) => item.provider),
       datasets: [
         {
-          label: 'API Usage',
+          label: t('apiUsageChart'),
           data: apiKeyUsage.map((item) => item.count),
           backgroundColor: apiKeyUsage.map((_, i) => getChartColors(i).bg),
           borderColor: apiKeyUsage.map((_, i) => getChartColors(i).border),
@@ -249,7 +273,8 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
       ...baseChartOptions.plugins,
       title: {
         ...baseChartOptions.plugins.title,
-        text: 'Chat History',
+        display: false,
+        text: t('chatHistory'),
       },
     },
     scales: {
@@ -292,7 +317,8 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
       ...baseChartOptions.plugins,
       title: {
         ...baseChartOptions.plugins.title,
-        text: 'Message Distribution',
+        display: false,
+        text: t('messageDistribution'),
       },
       legend: {
         ...baseChartOptions.plugins.legend,
@@ -311,16 +337,14 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
     return (
       <div className="text-center py-8">
         <div className="i-ph-chart-line-duotone w-12 h-12 mx-auto mb-4 text-bolt-elements-textTertiary opacity-80" />
-        <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">No Data Available</h3>
-        <p className="text-bolt-elements-textSecondary">
-          Start creating chats to see your usage statistics and data visualization.
-        </p>
+        <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">{t('noDataAvailable')}</h3>
+        <p className="text-bolt-elements-textSecondary">{t('noDataAvailableDesc')}</p>
       </div>
     );
   }
 
   const cardClasses = classNames(
-    'p-6 rounded-lg shadow-sm',
+    'px-5 py-4 rounded-lg shadow-sm',
     'bg-bolt-elements-bg-depth-1',
     'border border-bolt-elements-borderColor',
   );
@@ -328,52 +352,47 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
   const statClasses = classNames('text-3xl font-bold text-bolt-elements-textPrimary', 'flex items-center gap-3');
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className={cardClasses}>
-          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-4">Total Chats</h3>
+          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">{t('totalChats')}</h3>
           <div className={statClasses}>
             <div className="i-ph-chats-duotone w-8 h-8 text-indigo-500 dark:text-indigo-400" />
             <span>{chats.length}</span>
           </div>
         </div>
-
         <div className={cardClasses}>
-          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-4">Total Messages</h3>
+          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">{t('totalMessages')}</h3>
           <div className={statClasses}>
             <div className="i-ph-chat-text-duotone w-8 h-8 text-pink-500 dark:text-pink-400" />
             <span>{Object.values(messagesByRole).reduce((sum, count) => sum + count, 0)}</span>
           </div>
         </div>
-
         <div className={cardClasses}>
-          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-4">Avg. Messages/Chat</h3>
+          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">{t('avgMessagesPerChat')}</h3>
           <div className={statClasses}>
             <div className="i-ph-chart-bar-duotone w-8 h-8 text-green-500 dark:text-green-400" />
             <span>{averageMessagesPerChat.toFixed(1)}</span>
           </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
         <div className={cardClasses}>
-          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-6">Chat History</h3>
+          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">{t('chatHistory')}</h3>
           <div className="h-64">
             <Bar data={chartData.history} options={chartOptions} />
           </div>
         </div>
-
         <div className={cardClasses}>
-          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-6">Message Distribution</h3>
+          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">{t('messageDistribution')}</h3>
           <div className="h-64">
             <Pie data={chartData.roles} options={pieOptions} />
           </div>
         </div>
       </div>
-
       {apiKeyUsage.length > 0 && (
         <div className={cardClasses}>
-          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-6">API Usage by Provider</h3>
+          <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-2">{t('apiUsageByProvider')}</h3>
           <div className="h-64">
             <Pie data={chartData.apiUsage} options={pieOptions} />
           </div>
