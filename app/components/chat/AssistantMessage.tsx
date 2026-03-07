@@ -1,4 +1,4 @@
-import { memo, Fragment } from 'react';
+import { memo, Fragment, useMemo } from 'react';
 import { Markdown } from './Markdown';
 import type { JSONValue } from 'ai';
 import Popover from '~/components/ui/Popover';
@@ -103,10 +103,53 @@ export const AssistantMessage = memo(
       totalTokens: number;
     } = filteredAnnotations.find((annotation) => annotation.type === 'usage')?.value;
 
-    const toolInvocations = parts?.filter((part) => part.type === 'tool-invocation');
     const toolCallAnnotations = filteredAnnotations.filter(
       (annotation) => annotation.type === 'toolCall',
     ) as ToolCallAnnotation[];
+
+    /**
+     * Group parts into ordered segments so that tool invocation cards appear
+     * inline at their natural position instead of being pushed to the bottom.
+     *
+     * Each segment is either:
+     *   - { type: 'text', text: string }           – consecutive text parts merged
+     *   - { type: 'tool-invocations', parts: [] }  – consecutive tool invocations grouped
+     */
+    const groupedSegments = useMemo(() => {
+      if (!parts || parts.length === 0) {
+        // Fallback: no parts, just render content
+        return [{ type: 'text' as const, text: content }];
+      }
+
+      const segments: ({ type: 'text'; text: string } | { type: 'tool-invocations'; parts: ToolInvocationUIPart[] })[] =
+        [];
+
+      for (const part of parts) {
+        if (part.type === 'text') {
+          // Merge consecutive text parts
+          const last = segments[segments.length - 1];
+
+          if (last && last.type === 'text') {
+            last.text += part.text;
+          } else {
+            segments.push({ type: 'text', text: part.text });
+          }
+        } else if (part.type === 'tool-invocation') {
+          // Group consecutive tool invocation parts
+          const last = segments[segments.length - 1];
+
+          if (last && last.type === 'tool-invocations') {
+            last.parts.push(part);
+          } else {
+            segments.push({ type: 'tool-invocations', parts: [part] });
+          }
+        }
+
+        // Other part types (reasoning, source, file, step-start) are ignored for now
+      }
+
+      return segments;
+    }, [parts, content]);
 
     return (
       <div className="group overflow-hidden w-full">
@@ -178,25 +221,38 @@ export const AssistantMessage = memo(
           )}
         </div>
 
-        {/* Message content */}
+        {/* Message content — rendered in part order so tool cards stay in place */}
         <div className="pl-8">
-          <Markdown
-            append={append}
-            chatMode={chatMode}
-            setChatMode={setChatMode}
-            model={model}
-            provider={provider}
-            html
-          >
-            {content}
-          </Markdown>
-          {toolInvocations && toolInvocations.length > 0 && (
-            <ToolInvocations
-              toolInvocations={toolInvocations}
-              toolCallAnnotations={toolCallAnnotations}
-              addToolResult={addToolResult}
-            />
-          )}
+          {groupedSegments.map((segment, index) => {
+            if (segment.type === 'text') {
+              return (
+                <Markdown
+                  key={`text-${index}`}
+                  append={append}
+                  chatMode={chatMode}
+                  setChatMode={setChatMode}
+                  model={model}
+                  provider={provider}
+                  html
+                >
+                  {segment.text}
+                </Markdown>
+              );
+            }
+
+            if (segment.type === 'tool-invocations') {
+              return (
+                <ToolInvocations
+                  key={`tools-${index}`}
+                  toolInvocations={segment.parts}
+                  toolCallAnnotations={toolCallAnnotations}
+                  addToolResult={addToolResult}
+                />
+              );
+            }
+
+            return null;
+          })}
 
           {/* Bottom-left action bar — visible after streaming ends */}
           <AssistantMessageActions

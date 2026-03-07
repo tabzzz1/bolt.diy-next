@@ -20,6 +20,7 @@ type Store = {
   isInitialized: boolean;
   settings: MCPSettings;
   serverTools: MCPServerTools;
+  lastCheckedAt: number | null;
   error: string | null;
   isUpdatingConfig: boolean;
 };
@@ -34,6 +35,7 @@ export const useMCPStore = create<Store & Actions>((set, get) => ({
   isInitialized: false,
   settings: defaultSettings,
   serverTools: {},
+  lastCheckedAt: null,
   error: null,
   isUpdatingConfig: false,
   initialize: async () => {
@@ -48,7 +50,7 @@ export const useMCPStore = create<Store & Actions>((set, get) => ({
         try {
           const settings = JSON.parse(savedConfig) as MCPSettings;
           const serverTools = await updateServerConfig(settings.mcpConfig);
-          set(() => ({ settings, serverTools }));
+          set(() => ({ settings, serverTools, lastCheckedAt: Date.now() }));
         } catch (error) {
           console.error('Error parsing saved mcp config:', error);
           set(() => ({
@@ -76,7 +78,7 @@ export const useMCPStore = create<Store & Actions>((set, get) => ({
         localStorage.setItem(STORAGE_KEY_MCP_SETTINGS, JSON.stringify(newSettings));
       }
 
-      set(() => ({ settings: newSettings, serverTools }));
+      set(() => ({ settings: newSettings, serverTools, lastCheckedAt: Date.now() }));
     } catch (error) {
       throw error;
     } finally {
@@ -94,7 +96,7 @@ export const useMCPStore = create<Store & Actions>((set, get) => ({
 
     const serverTools = (await response.json()) as MCPServerTools;
 
-    set(() => ({ serverTools }));
+    set(() => ({ serverTools, lastCheckedAt: Date.now() }));
   },
 }));
 

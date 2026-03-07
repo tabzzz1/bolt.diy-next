@@ -27,7 +27,7 @@ i18n.use(initReactI18next).init({
   resources: { en, zh },
   lng: getInitialLanguage(),
   fallbackLng: 'en',
-  defaultNS: 'sidebar',
+  defaultNS: 'settings', // Changed from 'sidebar' to 'settings' to fix MCP errors
   ns: ['sidebar', 'settings', 'chat'],
   interpolation: {
     escapeValue: false,

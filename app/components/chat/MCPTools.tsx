@@ -2,12 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { classNames } from '~/utils/classNames';
 import { Dialog, DialogRoot, DialogClose, DialogTitle, DialogButton } from '~/components/ui/Dialog';
 import { IconButton } from '~/components/ui/IconButton';
+import { Tooltip } from '~/components/ui/Tooltip';
 import { useMCPStore } from '~/lib/stores/mcp';
-import McpServerList from '~/components/@settings/tabs/mcp/McpServerList';
+import McpServerList from '~/components/@settings/tabs/mcp/components/McpServerList';
+import { useTranslation } from 'react-i18next';
 
 export function McpTools() {
+  const { t, i18n } = useTranslation('settings');
   const isInitialized = useMCPStore((state) => state.isInitialized);
   const serverTools = useMCPStore((state) => state.serverTools);
+  const lastCheckedAt = useMCPStore((state) => state.lastCheckedAt);
   const initialize = useMCPStore((state) => state.initialize);
   const checkServersAvailabilities = useMCPStore((state) => state.checkServersAvailabilities);
 
@@ -29,7 +33,7 @@ export function McpTools() {
     try {
       await checkServersAvailabilities();
     } catch (e) {
-      setError(`Failed to check server availability: ${e instanceof Error ? e.message : String(e)}`);
+      setError(t('mcpTab.checkAvailabilityFailed', { message: e instanceof Error ? e.message : String(e) }));
     } finally {
       setIsCheckingServers(false);
     }
@@ -44,13 +48,30 @@ export function McpTools() {
   };
 
   const serverEntries = useMemo(() => Object.entries(serverTools), [serverTools]);
+  const formattedLastCheckedAt = useMemo(() => {
+    if (!lastCheckedAt) {
+      return '--';
+    }
+
+    const locale = i18n.language?.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US';
+
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: !locale.startsWith('zh'),
+    }).format(lastCheckedAt);
+  }, [i18n.language, lastCheckedAt]);
 
   return (
     <div className="relative">
       <div className="flex">
         <IconButton
           onClick={() => setIsDialogOpen(!isDialogOpen)}
-          title="MCP Tools Available"
+          title={t('mcpTab.toolsButtonTitle')}
           disabled={!isInitialized}
           className="transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -68,12 +89,30 @@ export function McpTools() {
             <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
               <DialogTitle>
                 <div className="i-bolt:mcp text-xl"></div>
-                MCP tools
+                <span>{t('mcpTab.toolsDialogTitle')}</span>
+                <Tooltip
+                  content={
+                    <div className="space-y-1">
+                      <p>{t('mcpTab.onlyAvailableHint')}</p>
+                      <p>{t('mcpTab.configureInSettings')}</p>
+                    </div>
+                  }
+                >
+                  <span
+                    className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full text-bolt-elements-textSecondary transition-colors hover:text-bolt-elements-textPrimary cursor-help"
+                    aria-label={t('mcpTab.onlyAvailableHint')}
+                  >
+                    <div className="i-ph:question text-sm" />
+                  </span>
+                </Tooltip>
               </DialogTitle>
 
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-end items-center mb-2">
+                  <div className="mb-2 flex items-center justify-between gap-4">
+                    <div className="text-xs text-bolt-elements-textSecondary">
+                      {t('mcpTab.lastCheckedAt')}: {formattedLastCheckedAt}
+                    </div>
                     <button
                       onClick={checkServerAvailability}
                       disabled={isCheckingServers || serverEntries.length === 0}
@@ -91,7 +130,7 @@ export function McpTools() {
                       ) : (
                         <div className="i-ph:arrow-counter-clockwise w-3 h-3" />
                       )}
-                      Check availability
+                      {t('mcpTab.checkAvailability')}
                     </button>
                   </div>
                   {serverEntries.length > 0 ? (
@@ -104,8 +143,8 @@ export function McpTools() {
                     />
                   ) : (
                     <div className="py-4 text-center text-bolt-elements-textSecondary">
-                      <p>No MCP servers configured</p>
-                      <p className="text-xs mt-1">Configure servers in Settings → MCP Servers</p>
+                      <p>{t('mcpTab.noServersConfigured')}</p>
+                      <p className="text-xs mt-1">{t('mcpTab.configureInSettings')}</p>
                     </div>
                   )}
                 </div>
@@ -116,7 +155,7 @@ export function McpTools() {
               <div className="flex justify-end gap-2 mt-6">
                 <div className="flex gap-2">
                   <DialogClose asChild>
-                    <DialogButton type="secondary">Close</DialogButton>
+                    <DialogButton type="secondary">{t('mcpTab.close')}</DialogButton>
                   </DialogClose>
                 </div>
               </div>
